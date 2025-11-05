@@ -26,9 +26,9 @@ jobs:
         #    このステップを忘れると、次のnpmコマンドでエラーになります。
 
         - uses: actions/setup-node@v4
-        with:
-        node-version: '20'
-        cache: 'npm' 
+          with:
+            node-version: '20'
+            cache: 'npm' 
         # → GitHubの仮想マシンに Node.js の指定バージョンをインストールします。
         #    `cache: 'npm'` を指定すると、依存パッケージが自動でキャッシュされ、
         #    次回のCI実行が速くなります。
