@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import * as v from "valibot";
 import { users as usersTable } from "./db/schema";
+import { cors } from "hono/cors";
 
 export interface Env {
 	DB: D1Database;
@@ -17,6 +18,8 @@ const createUserSchema = v.object({
 	email: v.pipe(v.string(), v.email()),
 	password: v.string(),
 });
+
+app.use("*", cors());
 
 app.get("/", (c) => c.text("Hono!"));
 
