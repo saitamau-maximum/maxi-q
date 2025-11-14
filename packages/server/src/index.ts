@@ -2,9 +2,9 @@ import { vValidator } from "@hono/valibot-validator";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import * as v from "valibot";
 import { users as usersTable } from "./db/schema";
-import { cors } from "hono/cors";
 
 export interface Env {
 	DB: D1Database;
