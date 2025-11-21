@@ -83,7 +83,7 @@ app.post("/ques", vValidator("json", createQuestionSchema), async (c) => {
 		const result = await db
 			.insert(questionTable)
 			.values({
-				content
+				content,
 			})
 			.returning();
 
