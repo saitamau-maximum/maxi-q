@@ -17,8 +17,7 @@ questions {
     TEXT created_at "投稿日時"
     TEXT updated_at "更新日時"
     INTEGER solved "解決or未解決(default:0)"
-    TEXT best_answer_id FK "ベストアンサーの回答ID(FK -> answers.answer_id, NULLable)" 
-
+    TEXT best_answer_id FK "ベストアンサーの回答ID(FK -> answers.answer_id, NULLable)"
 }
 
 answers {
