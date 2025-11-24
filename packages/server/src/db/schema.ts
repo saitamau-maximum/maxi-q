@@ -11,8 +11,8 @@ export const users = table("users", {
 	createdAt: t.integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
-export const question = table("question", {
-	postId: t.integer("post_id").primaryKey({ autoIncrement: true }),
+export const questions = table("question", {
+	postId: t.text("post_id").primaryKey(),
 	content: t.text("content").notNull(),
 	createdAt: t
 		.integer("created_at", { mode: "timestamp" })

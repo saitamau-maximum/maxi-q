@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import * as v from "valibot";
-import { question as questionTable, users as usersTable } from "./db/schema";
+import { questions as questionTable, users as usersTable } from "./db/schema";
 
 export interface Env {
 	DB: D1Database;
@@ -20,7 +20,7 @@ const createUserSchema = v.object({
 });
 
 const createQuestionSchema = v.object({
-	content: v.pipe(v.string(), v.minLength(1)),
+	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
 });
 
 app.use("*", cors());
@@ -75,7 +75,7 @@ app.post("/users", vValidator("json", createUserSchema), async (c) => {
 	}
 });
 
-app.post("/ques", vValidator("json", createQuestionSchema), async (c) => {
+app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
@@ -83,6 +83,7 @@ app.post("/ques", vValidator("json", createQuestionSchema), async (c) => {
 		const result = await db
 			.insert(questionTable)
 			.values({
+				postId: crypto.randomUUID(),
 				content,
 			})
 			.returning();
@@ -91,6 +92,19 @@ app.post("/ques", vValidator("json", createQuestionSchema), async (c) => {
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to create question" }, 500);
+	}
+});
+
+app.get("/questions/all", async (c) => {
+	const db = drizzle(c.env.DB);
+
+	try {
+		const questions = await db.select().from(questionTable).all();
+
+		return c.json(questions, 200);
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch questions" }, 500);
 	}
 });
 
