@@ -1,7 +1,7 @@
 CREATE TABLE questions (
-    post_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id TEXT PRIMARY KEY NOT NULL,
     content TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     solved INTEGER NOT NULL DEFAULT 0
 );

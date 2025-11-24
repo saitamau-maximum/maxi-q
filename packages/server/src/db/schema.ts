@@ -11,7 +11,7 @@ export const users = table("users", {
 	createdAt: t.integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
-export const questions = table("question", {
+export const questions = table("questions", {
 	postId: t.text("post_id").primaryKey(),
 	content: t.text("content").notNull(),
 	createdAt: t
