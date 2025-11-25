@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import * as v from "valibot";
-import { questions as questionTable, users as usersTable } from "./db/schema";
+import { questions as questionsTable, users as usersTable } from "./db/schema";
 
 export interface Env {
 	DB: D1Database;
@@ -20,6 +20,7 @@ const createUserSchema = v.object({
 });
 
 const createQuestionSchema = v.object({
+	title: v.pipe(v.string(), v.minLength(1), v.maxLength(255)),
 	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
 });
 
@@ -76,14 +77,15 @@ app.post("/users", vValidator("json", createUserSchema), async (c) => {
 });
 
 app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
-	const { content } = c.req.valid("json");
+	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
 	try {
 		const result = await db
-			.insert(questionTable)
+			.insert(questionsTable)
 			.values({
-				postId: crypto.randomUUID(),
+				id: crypto.randomUUID(),
+				title,
 				content,
 			})
 			.returning();
@@ -95,12 +97,11 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	}
 });
 
-app.get("/questions/all", async (c) => {
+app.get("/questions", async (c) => {
 	const db = drizzle(c.env.DB);
 
 	try {
-		const questions = await db.select().from(questionTable).all();
-
+		const questions = await db.select().from(questionsTable).all();
 		return c.json(questions, 200);
 	} catch (e) {
 		console.error(e);

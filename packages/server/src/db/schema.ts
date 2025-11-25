@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import * as t from "drizzle-orm/sqlite-core";
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
+import { title } from "valibot";
 
 export const users = table("users", {
 	id: t.text().primaryKey(),
@@ -12,7 +13,8 @@ export const users = table("users", {
 });
 
 export const questions = table("questions", {
-	postId: t.text("post_id").primaryKey(),
+	id: t.text("id").primaryKey(),
+	title: t.text("title").notNull(),
 	content: t.text("content").notNull(),
 	createdAt: t
 		.integer("created_at", { mode: "timestamp" })
