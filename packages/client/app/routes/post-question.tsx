@@ -1,33 +1,32 @@
 import { useRef } from "react";
 import { css } from "styled-system/css";
-import type { CreateQuestionParams } from "~/types/question";
-import { serverFetch } from "~/utils/fetch";
+import { usePostQuestion } from "../hooks/use-question";
 
 export default function QuestionsPage() {
 	const formRef = useRef<HTMLFormElement>(null);
+	const { postQuestion } = usePostQuestion();
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
 		const formData = new FormData(e.currentTarget);
-		const params: CreateQuestionParams = {
-			title: formData.get("title") as string,
-			content: formData.get("content") as string,
-		};
+
+		const title = formData.get("title");
+		const content = formData.get("content");
+
+		if (typeof title !== "string" || typeof content !== "string") {
+			console.error("タイトルまたは内容が不正です");
+			return;
+		}
 
 		try {
-			const response = await serverFetch("/questions", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(params),
-			});
+			const ok = await postQuestion({ title, content });
 
-			console.log("Question created:", params);
+			if (!ok) {
+				console.error("質問投稿に失敗しました");
+				return;
+			}
 
-			if (!response.ok) throw new Error("Failed to create question");
-
+			console.log("Question created!");
 			formRef.current?.reset();
 		} catch (error) {
 			console.error("Error creating question:", error);
@@ -65,8 +64,10 @@ export default function QuestionsPage() {
 				>
 					タイトル:
 					<input
+						type="text"
 						name="title"
 						required
+						maxLength={100}
 						className={css({
 							border: "1px solid #000",
 							padding: "8px",
@@ -84,8 +85,10 @@ export default function QuestionsPage() {
 				>
 					内容:
 					<textarea
+						id="content"
 						name="content"
 						required
+						maxLength={5000}
 						className={css({
 							border: "1px solid #000",
 							padding: "8px",
