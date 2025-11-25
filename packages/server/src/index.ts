@@ -88,7 +88,7 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 				title,
 				content,
 				createdAt: new Date(),
-  				updatedAt: new Date(),
+				updatedAt: new Date(),
 			})
 			.returning();
 
