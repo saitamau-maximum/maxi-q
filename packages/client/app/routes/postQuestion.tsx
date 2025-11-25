@@ -24,8 +24,7 @@ export default function QuestionsPage() {
 				body: JSON.stringify(params),
 			});
 
-            console.log("Question created:", params);
-
+			console.log("Question created:", params);
 
 			if (!response.ok) throw new Error("Failed to create question");
 
