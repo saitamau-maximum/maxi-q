@@ -1,10 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { css } from "styled-system/css";
 import { usePostQuestion } from "../hooks/use-question";
 
 export default function QuestionsPage() {
 	const formRef = useRef<HTMLFormElement>(null);
 	const { postQuestion } = usePostQuestion();
+
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -17,6 +19,9 @@ export default function QuestionsPage() {
 			console.error("タイトルまたは内容が不正です");
 			return;
 		}
+
+		if (isSubmitting) return;
+		setIsSubmitting(true);
 
 		try {
 			const ok = await postQuestion({ title, content });
@@ -77,6 +82,7 @@ export default function QuestionsPage() {
 				</label>
 
 				<label
+					htmlFor="content"
 					className={css({
 						display: "flex",
 						flexDirection: "column",
