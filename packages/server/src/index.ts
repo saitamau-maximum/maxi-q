@@ -6,12 +6,12 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { sign } from "hono/jwt";
 import * as v from "valibot";
-import { authMiddleware } from "./middlewares/auth";
 import {
 	answers as answersTable,
 	questions as questionsTable,
 	users as usersTable,
 } from "./db/schema";
+import { authMiddleware } from "./middlewares/auth";
 
 export interface Env {
 	DB: D1Database;
