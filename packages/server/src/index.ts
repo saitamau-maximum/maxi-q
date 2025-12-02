@@ -1,17 +1,17 @@
 import { vValidator } from "@hono/valibot-validator";
+import { compare, hash } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { sign } from "hono/jwt"; 
-import { hash, compare } from "bcryptjs";
-import { authMiddleware } from "./middlewares/auth"; 
+import { sign } from "hono/jwt";
 import * as v from "valibot";
 import { questions as questionsTable, users as usersTable } from "./db/schema";
+import { authMiddleware } from "./middlewares/auth";
 
 export interface Env {
-  DB: D1Database;
-  JWT_SECRET: string; //JWTシークレットキーは server/wrangler.json で設定
+	DB: D1Database;
+	JWT_SECRET: string; //JWTシークレットキーは server/wrangler.json で設定
 }
 
 export const app = new Hono<{ Bindings: Env }>({});
@@ -24,8 +24,8 @@ const createUserSchema = v.object({
 });
 
 const loginUserSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
-  password: v.string(),
+	email: v.pipe(v.string(), v.email()),
+	password: v.string(),
 });
 
 const createQuestionSchema = v.object({
@@ -87,60 +87,58 @@ app.post("/api/register", vValidator("json", createUserSchema), async (c) => {
 });
 
 app.post("/login", vValidator("json", loginUserSchema), async (c) => {
-  const { email, password } = c.req.valid("json");
-  const db = drizzle(c.env.DB);
+	const { email, password } = c.req.valid("json");
+	const db = drizzle(c.env.DB);
 
-  try {
-    // メールアドレスでユーザーを検索
-    const user = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, email))
-      .get();
+	try {
+		// メールアドレスでユーザーを検索
+		const user = await db
+			.select()
+			.from(usersTable)
+			.where(eq(usersTable.email, email))
+			.get();
 
-    if (!user) {
-      return c.json({ error: "Invalid email or password" }, 401);
-    }
+		if (!user) {
+			return c.json({ error: "Invalid email or password" }, 401);
+		}
 
-    // パスワードを照合（compare を使う）
-    const isValid = await compare(password, user.passwordHash);
+		// パスワードを照合（compare を使う）
+		const isValid = await compare(password, user.passwordHash);
 
-    if (!isValid) {
-      return c.json({ error: "Invalid email or password" }, 401);
-    }
+		if (!isValid) {
+			return c.json({ error: "Invalid email or password" }, 401);
+		}
 
-    // JWTペイロード作成
-    const payload = {
-      sub: user.id,
-      name: user.name,
-      displayId: user.displayId,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,  // 24時間
-    };
+		// JWTペイロード作成
+		const payload = {
+			sub: user.id,
+			name: user.name,
+			displayId: user.displayId,
+			exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // 24時間
+		};
 
-    if (!c.env.JWT_SECRET) {
-      console.error("JWT_SECRET is not set");
-      return c.json({ error: "Internal Server Error" }, 500);
-    }
+		if (!c.env.JWT_SECRET) {
+			console.error("JWT_SECRET is not set");
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
 
-    // トークンの発行
-    const token = await sign(payload, c.env.JWT_SECRET);
+		// トークンの発行
+		const token = await sign(payload, c.env.JWT_SECRET);
 
-    return c.json({
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        displayId: user.displayId,
-        email: user.email
-      }
-    });
-
-  } catch (e) {
-    console.error(e);
-    return c.json({ error: "Login failed" }, 500);
-  }
+		return c.json({
+			token,
+			user: {
+				id: user.id,
+				name: user.name,
+				displayId: user.displayId,
+				email: user.email,
+			},
+		});
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Login failed" }, 500);
+	}
 });
-
 
 app.use("/questions/*", authMiddleware);
 
