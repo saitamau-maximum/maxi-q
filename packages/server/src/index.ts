@@ -5,7 +5,11 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import * as v from "valibot";
-import { questions as questionsTable, users as usersTable } from "./db/schema";
+import {
+	answers as answersTable,
+	questions as questionsTable,
+	users as usersTable,
+} from "./db/schema";
 
 export interface Env {
 	DB: D1Database;
@@ -22,6 +26,10 @@ const createUserSchema = v.object({
 
 const createQuestionSchema = v.object({
 	title: v.pipe(v.string(), v.minLength(1), v.maxLength(255)),
+	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
+});
+
+const createAnswerSchema = v.object({
 	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
 });
 
@@ -125,5 +133,44 @@ app.get("/questions", async (c) => {
 		return c.json({ error: "Failed to fetch questions" }, 500);
 	}
 });
+
+app.post(
+	"/questions/:id/answers",
+	vValidator("json", createAnswerSchema),
+	async (c) => {
+		const { id: questionId } = c.req.param();
+		const { content } = c.req.valid("json");
+
+		const db = drizzle(c.env.DB);
+
+		const question = await db
+			.select()
+			.from(questionsTable)
+			.where(eq(questionsTable.id, questionId))
+			.get();
+
+		if (!question) {
+			return c.json({ error: "Question not found" }, 404);
+		}
+
+		try {
+			const result = await db
+				.insert(answersTable)
+				.values({
+					id: crypto.randomUUID(),
+					questionId: questionId,
+					content,
+					answeredAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.returning();
+
+			return c.json(result, 201);
+		} catch (e) {
+			console.error(e);
+			return c.json({ error: "Failed to post answer" }, 500);
+		}
+	},
+);
 
 export default { fetch: app.fetch };
