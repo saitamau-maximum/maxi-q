@@ -3,24 +3,15 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { sign } from "hono/jwt"; // JWT用の関数をインポート
-import { verify } from "hono/jwt";// 認証ミドルウェア用の関数をインポート
-import { authMiddleware } from "./middlewares/auth"; //追加
+import { sign } from "hono/jwt"; 
+import { hash, compare } from "bcryptjs";
+import { authMiddleware } from "./middlewares/auth"; 
 import * as v from "valibot";
 import { questions as questionsTable, users as usersTable } from "./db/schema";
 
 export interface Env {
   DB: D1Database;
-  JWT_SECRET: string; // 環境変数にJWTシークレットを追加
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  JWT_SECRET: string; //JWTシークレットキーは server/wrangler.json で設定
 }
 
 export const app = new Hono<{ Bindings: Env }>({});
@@ -69,24 +60,22 @@ app.get("/users/:id", async (c) => {
 	}
 });
 
-// ユーザー登録（ハッシュ化対応済み）
-app.post("/users", vValidator("json", createUserSchema), async (c) => {
+app.post("/api/register", vValidator("json", createUserSchema), async (c) => {
 	const { displayId, name, email, password } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
 	// TODO: passwordのハッシュ化を行う
-
 	try {
-    const passwordHash = await hashPassword(password);
-		
-    const result = await db
+		const hashedPassword = await hash(password, 10);
+
+		const result = await db
 			.insert(usersTable)
 			.values({
 				id: crypto.randomUUID(),
 				displayId,
 				name,
 				email,
-				passwordHash: passwordHash,
+				passwordHash: hashedPassword,
 				createdAt: new Date(),
 			})
 			.returning();
@@ -97,7 +86,6 @@ app.post("/users", vValidator("json", createUserSchema), async (c) => {
 	}
 });
 
-// ログインAPI（新規追加）
 app.post("/login", vValidator("json", loginUserSchema), async (c) => {
   const { email, password } = c.req.valid("json");
   const db = drizzle(c.env.DB);
@@ -114,23 +102,21 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
       return c.json({ error: "Invalid email or password" }, 401);
     }
 
-    // パスワードの照合（入力されたパスワードをハッシュ化して比較）
-    const inputHash = await hashPassword(password);
-    
-    if (user.passwordHash !== inputHash) {
+    // パスワードを照合（compare を使う）
+    const isValid = await compare(password, user.passwordHash);
+
+    if (!isValid) {
       return c.json({ error: "Invalid email or password" }, 401);
     }
 
-    // JWTペイロードの作成
+    // JWTペイロード作成
     const payload = {
       sub: user.id,
       name: user.name,
       displayId: user.displayId,
-      // トークンの有効期限 (例: 24時間後)
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, 
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,  // 24時間
     };
 
-    // シークレットキーの取得確認
     if (!c.env.JWT_SECRET) {
       console.error("JWT_SECRET is not set");
       return c.json({ error: "Internal Server Error" }, 500);
@@ -155,7 +141,7 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
   }
 });
 
-// JWT 認証を /questions に適用
+
 app.use("/questions/*", authMiddleware);
 
 app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
