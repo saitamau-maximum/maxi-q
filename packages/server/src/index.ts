@@ -13,7 +13,7 @@ import {
 } from "./db/schema";
 import { authMiddleware } from "./middlewares/auth";
 
-const EXPIRED_DURATION=60 * 60 * 48;
+const EXPIRED_DURATION = 60 * 60 * 48;
 
 export const app = new Hono<{ Bindings: Env }>({});
 
