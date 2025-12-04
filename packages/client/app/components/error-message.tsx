@@ -30,12 +30,10 @@ export default function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
 					type="button"
 					onClick={onRetry}
 					className={css({
-						padding: "12px 24px",
-						backgroundColor: "blue.500",
-						color: "white",
-						borderRadius: "8px",
-						cursor: "pointer",
-						fontWeight: "bold",
+						marginTop: "1rem",
+						padding: "0.5rem 1rem",
+						borderRadius: "0.5rem",
+						backgroundColor: "gray.200",
 					})}
 				>
 					再読み込み

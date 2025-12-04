@@ -1,9 +1,11 @@
 export type CreateAnswerParams = {
-	content: string;
+    content: string;
 };
 
 export type Answer = {
-	id: string;
-	content: string;
-	answeredAt: string;
+    id: string;
+    questionId: string;
+    content: string;
+    answeredAt: string;
+    updatedAt: string;
 };

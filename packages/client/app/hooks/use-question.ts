@@ -1,4 +1,4 @@
-import { usePost } from "~/hooks/use-post";
+import { usePost } from "~/utils/post";
 import type { CreateQuestionParams } from "~/types/question";
 
 export function usePostQuestion() {

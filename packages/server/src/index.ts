@@ -99,6 +99,18 @@ app.post("/api/register", vValidator("json", createUserSchema), async (c) => {
 	}
 });
 
+app.get("/questions", async (c) => {
+	const db = drizzle(c.env.DB);
+
+	try {
+		const questions = await db.select().from(questionsTable).all();
+		return c.json(questions, 200);
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch questions" }, 500);
+	}
+});
+
 app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
@@ -122,18 +134,6 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	}
 });
 
-app.get("/questions", async (c) => {
-	const db = drizzle(c.env.DB);
-
-	try {
-		const questions = await db.select().from(questionsTable).all();
-		return c.json(questions, 200);
-	} catch (e) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch questions" }, 500);
-	}
-});
-
 app.get("/questions/:id", async (c) => {
 	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
@@ -153,6 +153,26 @@ app.get("/questions/:id", async (c) => {
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch question" }, 500);
+	}
+});
+
+
+app.get("/questions/:id/answers", async (c) => {
+	const { id: questionId } = c.req.param();
+	const db = drizzle(c.env.DB);
+
+	try {
+		// 回答一覧取得
+		const answers = await db
+			.select()
+			.from(answersTable)
+			.where(eq(answersTable.questionId, questionId))
+			.all();
+
+		return c.json(answers, 200);
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch answers" }, 500);
 	}
 });
 
@@ -194,24 +214,5 @@ app.post(
 		}
 	},
 );
-
-app.get("/questions/:id/answers", async (c) => {
-	const { id: questionId } = c.req.param();
-	const db = drizzle(c.env.DB);
-
-	try {
-		// 回答一覧取得
-		const answers = await db
-			.select()
-			.from(answersTable)
-			.where(eq(answersTable.questionId, questionId))
-			.all();
-
-		return c.json(answers, 200);
-	} catch (e) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch answers" }, 500);
-	}
-});
 
 export default { fetch: app.fetch };
