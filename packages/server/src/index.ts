@@ -200,16 +200,6 @@ app.get("/questions/:id/answers", async (c) => {
 	const db = drizzle(c.env.DB);
 
 	try {
-		const question = await db
-			.select()
-			.from(questionsTable)
-			.where(eq(questionsTable.id, questionId))
-			.get();
-
-		if (!question) {
-			return c.json({ error: "Question not found" }, 404);
-		}
-
 		// 回答一覧取得
 		const answers = await db
 			.select()

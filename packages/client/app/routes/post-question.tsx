@@ -10,32 +10,26 @@ export default function QuestionsPage() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const formData = new FormData(e.currentTarget);
 
+		const formData = new FormData(e.currentTarget);
 		const title = formData.get("title");
 		const content = formData.get("content");
 
-		if (typeof title !== "string" || typeof content !== "string") {
-			console.error("タイトルまたは内容が不正です");
-			return;
-		}
-
+		if (typeof title !== "string" || typeof content !== "string") return;
 		if (isSubmitting) return;
+
 		setIsSubmitting(true);
 
-		try {
-			const ok = await postQuestion({ title, content });
+		const { ok } = await postQuestion({ title, content });
 
-			if (!ok) {
-				console.error("質問投稿に失敗しました");
-				return;
-			}
-
+		if (!ok) {
+			console.error("質問投稿に失敗しました");
+		} else {
 			console.log("Question created!");
 			formRef.current?.reset();
-		} catch (error) {
-			console.error("Error creating question:", error);
 		}
+
+		setIsSubmitting(false);
 	};
 
 	return (

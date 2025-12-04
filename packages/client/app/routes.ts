@@ -13,7 +13,7 @@ export default [
 		route("me/posts", "routes/users/me/posts.tsx"),
 		route(":id/answers", "routes/users/:id/answers.tsx"),
 	]),
-	route("posts/:id", "routes/posts/:id.tsx"),
+	route("posts/:id", "routes/posts/index.tsx"),
 	route("post", "routes/post.tsx"),
 	route("timeline", "routes/timeline.tsx"),
 	index("routes/home.tsx"),

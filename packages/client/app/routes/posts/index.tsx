@@ -2,14 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { css } from "styled-system/css";
 import { serverFetch } from "~/utils/fetch";
+import { usePost } from "../../hooks/use-post";
+import type { Question } from "~/types/question";
+import type { Answer } from "~/types/answer";
+import ErrorMessage from "../../components/ErrorMessage";
 
 export default function PostDetail() {
 	const { id } = useParams();
-	const [question, setQuestion] = useState<any>(null);
-	const [answers, setAnswers] = useState<any[]>([]);
+	const [question, setQuestion] = useState<Question | null>(null);
+	const [answers, setAnswers] = useState<Answer[]>([]);
 	const [answerContent, setAnswerContent] = useState("");
-	const [submitting, setSubmitting] = useState(false); // 送信中フラグ
+	const [submitting, setSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const { post } = usePost();
 
+	// 質問取得
 	const fetchQuestion = useCallback(async () => {
 		if (!id) return;
 
@@ -19,9 +26,11 @@ export default function PostDetail() {
 			setQuestion(await res.json());
 		} catch (e) {
 			console.error(e);
+			setError("質問の取得に失敗しました。");
 		}
 	}, [id]);
 
+	// 回答取得
 	const fetchAnswers = useCallback(async () => {
 		if (!id) return;
 
@@ -31,43 +40,52 @@ export default function PostDetail() {
 			setAnswers(await res.json());
 		} catch (e) {
 			console.error(e);
+			setError("回答一覧の取得に失敗しました。");
 		}
 	}, [id]);
 
+	// 初期ロード
 	useEffect(() => {
+		setError(null);
 		fetchQuestion();
 		fetchAnswers();
 	}, [fetchQuestion, fetchAnswers]);
 
+	// 回答投稿
 	const submitAnswer = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!answerContent.trim()) return;
 
 		setSubmitting(true);
+		setError(null);
 
-		try {
-			const res = await serverFetch(`/questions/${id}/answers`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ content: answerContent }),
-			});
+		const { ok } = await post(`/questions/${id}/answers`, {
+			content: answerContent,
+		});
 
-			if (!res.ok) throw new Error("Failed to post answer");
-
-			const newAnswer = await res.json();
-
-			console.log("Answer posted:", newAnswer);
-
+		if (ok) {
 			setAnswerContent("");
 			await fetchAnswers();
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setSubmitting(false);
+		} else {
+			setError("回答の投稿に失敗しました。");
 		}
+
+		setSubmitting(false);
 	};
+
+	if (!id) {
+		return <ErrorMessage message="エラー: 投稿IDが指定されていません。" />;
+	}
+
+	// エラー UI
+	if (error) {
+		return (
+			<ErrorMessage
+				message={error}
+				onRetry={() => window.location.reload()}
+			/>
+		);
+	}
 
 	return (
 		<div
@@ -77,7 +95,8 @@ export default function PostDetail() {
 				padding: "16px",
 			})}
 		>
-			{question ? (
+
+			{question && (
 				<div
 					className={css({
 						padding: "16px",
@@ -95,6 +114,7 @@ export default function PostDetail() {
 					>
 						{question.title}
 					</h1>
+
 					<p
 						className={css({
 							fontSize: "16px",
@@ -104,9 +124,8 @@ export default function PostDetail() {
 						{question.content}
 					</p>
 				</div>
-			) : (
-				<p>Loading question...</p>
 			)}
+
 			<h2
 				className={css({
 					fontSize: "20px",
@@ -150,6 +169,7 @@ export default function PostDetail() {
 					))
 				)}
 			</div>
+
 			<form
 				onSubmit={submitAnswer}
 				className={css({
@@ -158,7 +178,18 @@ export default function PostDetail() {
 					gap: "12px",
 				})}
 			>
+				<label
+					htmlFor="answer"
+					className={css({
+						fontWeight: "bold",
+						fontSize: "14px",
+					})}
+				>
+					あなたの回答
+				</label>
+
 				<textarea
+					id="answer" // ← label と紐付け
 					className={css({
 						padding: "12px",
 						border: "1px solid #ccc",
@@ -174,6 +205,7 @@ export default function PostDetail() {
 				<button
 					type="submit"
 					disabled={submitting}
+					aria-disabled={submitting}
 					className={css({
 						padding: "12px",
 						backgroundColor: submitting ? "gray.400" : "blue.500",
@@ -182,7 +214,6 @@ export default function PostDetail() {
 						cursor: submitting ? "not-allowed" : "pointer",
 						fontSize: "16px",
 						fontWeight: "bold",
-						transition: "0.2s",
 					})}
 				>
 					{submitting ? "Posting..." : "Post Answer"}
@@ -191,3 +222,4 @@ export default function PostDetail() {
 		</div>
 	);
 }
+
