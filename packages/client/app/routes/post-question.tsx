@@ -43,15 +43,25 @@ export default function QuestionsPage() {
 				fontSize: "16px",
 			})}
 		>
-			<h1 className={css({ fontSize: "24px", marginBottom: "16px" })}>質問投稿</h1>
+			<h1 className={css({ fontSize: "24px", marginBottom: "16px" })}>
+				質問投稿
+			</h1>
 
 			<form
 				ref={formRef}
 				onSubmit={handleSubmit}
-				className={css({ display: "flex", flexDirection: "column", gap: "16px" })}
+				className={css({
+					display: "flex",
+					flexDirection: "column",
+					gap: "16px",
+				})}
 			>
 				<label
-					className={css({ display: "flex", flexDirection: "column", gap: "4px" })}
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: "4px",
+					})}
 				>
 					タイトル:
 					<input
@@ -59,13 +69,21 @@ export default function QuestionsPage() {
 						name="title"
 						required
 						maxLength={100}
-						className={css({ border: "1px solid #000", padding: "8px", borderRadius: "4px" })}
+						className={css({
+							border: "1px solid #000",
+							padding: "8px",
+							borderRadius: "4px",
+						})}
 					/>
 				</label>
 
 				<label
 					htmlFor="content"
-					className={css({ display: "flex", flexDirection: "column", gap: "4px" })}
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: "4px",
+					})}
 				>
 					内容:
 					<textarea

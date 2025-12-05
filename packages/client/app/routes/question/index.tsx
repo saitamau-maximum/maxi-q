@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { css } from "styled-system/css";
-import { useQuestion } from "~/hooks/use-question";
 import { useAnswers } from "~/hooks/use-answer";
+import { useQuestion } from "~/hooks/use-question";
 import ErrorMessage from "../../components/error-message";
 
 export default function QuestionDetailPage() {
 	const { id } = useParams<{ id: string }>();
 
-	const { question, isLoading: questionLoading, error: questionError, refetch: refetchQuestion } = useQuestion(id);
-	const { answers, isLoading: answersLoading, error: answersError, isPending: submitting, submitAnswer, refetch: refetchAnswers } = useAnswers(id);
+	const {
+		question,
+		isLoading: questionLoading,
+		error: questionError,
+		refetch: refetchQuestion,
+	} = useQuestion(id);
+	const {
+		answers,
+		isLoading: answersLoading,
+		error: answersError,
+		isPending: submitting,
+		submitAnswer,
+		refetch: refetchAnswers,
+	} = useAnswers(id);
 
 	const [answerContent, setAnswerContent] = useState("");
 
