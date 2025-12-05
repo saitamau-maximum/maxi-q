@@ -15,9 +15,12 @@ export function useAnswers(questionId?: string) {
 				throw new Error("Question ID is required to post an answer.");
 			}
 			// postRequest を直接利用
-			return await postRequest<Answer>(`/questions/${questionId}/answers`, params);
+			return await postRequest<Answer>(
+				`/questions/${questionId}/answers`,
+				params,
+			);
 		},
-		[questionId]
+		[questionId],
 	);
 
 	// 回答取得
@@ -56,7 +59,7 @@ export function useAnswers(questionId?: string) {
 				setIsPending(false);
 			}
 		},
-		[questionId, fetchAnswers, postAnswer]
+		[questionId, fetchAnswers, postAnswer],
 	);
 
 	// 初期ロード
