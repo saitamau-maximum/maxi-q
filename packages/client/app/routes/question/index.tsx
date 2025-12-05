@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
@@ -7,10 +7,6 @@ import { useQuestion } from "~/hooks/use-question";
 
 export default function QuestionDetailPage() {
 	const { id } = useParams<{ id: string }>();
-
-	if (!id) {
-		return <ErrorMessage message="Question ID is missing" />;
-	}
 
 	const {
 		question,
@@ -25,6 +21,10 @@ export default function QuestionDetailPage() {
 		isPending: submitting,
 		submitAnswer,
 	} = useAnswers(id);
+
+	if (!id) {
+		return <ErrorMessage message="Question ID is missing" />;
+	}
 
 	const [answerContent, setAnswerContent] = useState("");
 
