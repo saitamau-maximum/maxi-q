@@ -169,15 +169,44 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	}
 });
 
-app.get("/questions", async (c) => {
+app.get("/questions/:id", async (c) => {
+	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
 
 	try {
-		const questions = await db.select().from(questionsTable).all();
-		return c.json(questions, 200);
+		const question = await db
+			.select()
+			.from(questionsTable)
+			.where(eq(questionsTable.id, id))
+			.get();
+
+		if (!question) {
+			return c.json({ error: "Question not found" }, 404);
+		}
+
+		return c.json(question, 200);
 	} catch (e) {
 		console.error(e);
-		return c.json({ error: "Failed to fetch questions" }, 500);
+		return c.json({ error: "Failed to fetch question" }, 500);
+	}
+});
+
+app.get("/questions/:id/answers", async (c) => {
+	const { id: questionId } = c.req.param();
+	const db = drizzle(c.env.DB);
+
+	try {
+		// 回答一覧取得
+		const answers = await db
+			.select()
+			.from(answersTable)
+			.where(eq(answersTable.questionId, questionId))
+			.all();
+
+		return c.json(answers, 200);
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch answers" }, 500);
 	}
 });
 
