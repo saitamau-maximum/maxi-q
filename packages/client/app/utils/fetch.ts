@@ -16,7 +16,7 @@ export const serverFetch = (url: string, options: RequestInit = {}) => {
 	});
 };
 
-export const postFetch = async <T = unknown>(
+export const postRequest = async <T = unknown>(
 	url: string,
 	body: object,
 ): Promise<T> => {

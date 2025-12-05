@@ -1,17 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Answer, CreateAnswerParams } from "~/types/answer";
-import { postFetch, serverFetch } from "~/utils/fetch";
-
-export function usePostAnswer() {
-	const postAnswer = async (
-		questionId: string,
-		params: CreateAnswerParams,
-	): Promise<Answer> => {
-		return await postFetch<Answer>(`/questions/${questionId}/answers`, params);
-	};
-
-	return { postAnswer };
-}
+import { postRequest, serverFetch } from "~/utils/fetch";
 
 export function useAnswers(questionId?: string) {
 	const [answers, setAnswers] = useState<Answer[]>([]);
@@ -19,7 +8,17 @@ export function useAnswers(questionId?: string) {
 	const [isPending, setIsPending] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 
-	const { postAnswer } = usePostAnswer();
+	// 回答投稿2
+	const postAnswer = useCallback(
+		async (params: CreateAnswerParams): Promise<Answer> => {
+			if (!questionId) {
+				throw new Error("Question ID is required to post an answer.");
+			}
+			// postRequest を直接利用
+			return await postRequest<Answer>(`/questions/${questionId}/answers`, params);
+		},
+		[questionId]
+	);
 
 	// 回答取得
 	const fetchAnswers = useCallback(async () => {
@@ -31,7 +30,6 @@ export function useAnswers(questionId?: string) {
 		try {
 			const res = await serverFetch(`/questions/${questionId}/answers`);
 			if (!res.ok) throw new Error("Failed to fetch answers");
-
 			setAnswers(await res.json());
 		} catch (err) {
 			console.error(err);
@@ -41,7 +39,7 @@ export function useAnswers(questionId?: string) {
 		}
 	}, [questionId]);
 
-	// 回答投稿
+	// 回答投稿1+再取得
 	const submitAnswer = useCallback(
 		async (content: string) => {
 			if (!questionId || !content.trim()) return;
@@ -49,7 +47,7 @@ export function useAnswers(questionId?: string) {
 			setError(null);
 
 			try {
-				await postAnswer(questionId, { content });
+				await postAnswer({ content });
 				await fetchAnswers();
 			} catch (err) {
 				console.error(err);
@@ -58,9 +56,10 @@ export function useAnswers(questionId?: string) {
 				setIsPending(false);
 			}
 		},
-		[questionId, fetchAnswers, postAnswer],
+		[questionId, fetchAnswers, postAnswer]
 	);
 
+	// 初期ロード
 	useEffect(() => {
 		fetchAnswers();
 	}, [fetchAnswers]);

@@ -14,6 +14,7 @@ export default function QuestionDetailPage() {
 		error: questionError,
 		refetch: refetchQuestion,
 	} = useQuestion(id);
+	
 	const {
 		answers,
 		isLoading: answersLoading,

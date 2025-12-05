@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CreateQuestionParams } from "~/types/question";
-import { postFetch, serverFetch } from "~/utils/fetch";
+import { postRequest, serverFetch } from "~/utils/fetch";
 import type { Question } from "../types/question";
 
 export function usePostQuestion() {
 	const postQuestion = async (
 		params: CreateQuestionParams,
 	): Promise<Question> => {
-		return await postFetch<Question>("/questions", params);
+		return await postRequest<Question>("/questions", params);
 	};
 
 	return { postQuestion };
 }
 
-export function useQuestion(questionId: string | undefined) {
+export function useQuestion(questionId?: string) {
 	const [question, setQuestion] = useState<Question | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
