@@ -15,7 +15,12 @@ import { authMiddleware } from "./middlewares/auth";
 
 const EXPIRED_DURATION = 60 * 60 * 48;
 
-export const app = new Hono<{ Bindings: Env }>({});
+export const app = new Hono<{
+  Bindings: Env;
+  Variables: {
+    userId: string;
+  };
+}>({});
 
 const registerSchema = v.object({
 	displayId: v.string(),
@@ -75,6 +80,29 @@ app.get("/users/:id", async (c) => {
 		console.error(e);
 		return c.json({ error: "User not found" }, 404);
 	}
+});
+
+app.get("/auth/me", authMiddleware, async (c) => {
+	const db = drizzle(c.env.DB);
+
+	const userId = c.get("userId");
+
+	const user = await db
+		.select({
+			id: usersTable.id,
+			displayId: usersTable.displayId,
+			name: usersTable.name,
+			createdAt: usersTable.createdAt,
+		})
+		.from(usersTable)
+		.where(eq(usersTable.id, userId))
+		.get();
+
+	if (!user) {
+		return c.json({ error: "User not found" }, 404);
+	}
+
+	return c.json(user);
 });
 
 app.post("/api/register", vValidator("json", registerSchema), async (c) => {
