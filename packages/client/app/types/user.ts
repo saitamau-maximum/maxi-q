@@ -14,8 +14,8 @@ export type User = {
 };
 
 export type AuthUser = {
-    id: string;
-    displayId: string;
-    name: string;
-    createdAt: Date;
+	id: string;
+	displayId: string;
+	name: string;
+	createdAt: Date;
 };

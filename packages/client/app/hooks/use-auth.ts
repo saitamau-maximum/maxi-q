@@ -1,48 +1,48 @@
 import { useEffect, useState } from "react";
-import { serverFetch } from "~/utils/fetch";
 import type { AuthUser } from "~/types/user";
+import { serverFetch } from "~/utils/fetch";
 
 export function useAuth() {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
+	const [user, setUser] = useState<AuthUser | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
+	useEffect(() => {
+		const controller = new AbortController();
 
-        async function fetchMe() {
-            const token = localStorage.getItem("token");
+		async function fetchMe() {
+			const token = localStorage.getItem("token");
 
-            if (!token) {
-                setIsLoading(false);
-                return;
-            }
+			if (!token) {
+				setIsLoading(false);
+				return;
+			}
 
-            try {
-                const res = await serverFetch("/auth/me", {
-                    signal: controller.signal,
-                });
+			try {
+				const res = await serverFetch("/auth/me", {
+					signal: controller.signal,
+				});
 
-                if (!res.ok) {
-                    throw new Error("Unauthorized");
-                }
+				if (!res.ok) {
+					throw new Error("Unauthorized");
+				}
 
-                const data: AuthUser = await res.json();
-                setUser(data);
-            } catch (e) {
-                if (controller.signal.aborted) return; // 中断された場合は何もしない
-                console.error(e);
-                setError(e instanceof Error ? e : new Error("Unknown error"));
-                setUser(null);
-            } finally {
-                setIsLoading(false);
-            }
-        }
+				const data: AuthUser = await res.json();
+				setUser(data);
+			} catch (e) {
+				if (controller.signal.aborted) return; // 中断された場合は何もしない
+				console.error(e);
+				setError(e instanceof Error ? e : new Error("Unknown error"));
+				setUser(null);
+			} finally {
+				setIsLoading(false);
+			}
+		}
 
-        fetchMe();
+		fetchMe();
 
-        return () => controller.abort();
-    }, []);
+		return () => controller.abort();
+	}, []);
 
-    return { user, isLoading, error };
+	return { user, isLoading, error };
 }
