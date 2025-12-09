@@ -1,20 +1,35 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
-import { useMe } from "~/hooks/use-auth";
+import { useAuth } from "~/hooks/use-auth";
 
 // TODO ログインしていなくてリダイレクトされたときにUIエラーを出す。
 
 export default function ProtectedLayout() {
-	const { user, loading } = useMe();
+	const { user, isLoading, error } = useAuth();
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!loading && !user) {
+		if (!isLoading && !user) {
 			navigate("/login");
 		}
-	}, [loading, user, navigate]);
+	}, [isLoading, user, navigate]);
 
-	if (loading) return <div>Loading...</div>;
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
 
-	return <Outlet />;
+	if (error) {
+		return (
+			<div style={{ padding: "20px", color: "red" }}>
+				<h2>エラーが発生しました</h2>
+				<p>{error.message}</p>
+			</div>
+		);
+	}
+
+	if (user) {
+		return <Outlet />;
+	}
+
+	return null;
 }

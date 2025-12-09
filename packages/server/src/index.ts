@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { sign } from "hono/jwt";
+import { sign, jwt } from "hono/jwt";
 import * as v from "valibot";
 import {
 	answers as answersTable,
@@ -82,10 +82,15 @@ app.get("/users/:id", async (c) => {
 	}
 });
 
-app.get("/auth/me", authMiddleware, async (c) => {
+app.use("/auth/*", async (c, next) => {
+  const middleware = jwt({ secret: c.env.JWT_SECRET });
+  return middleware(c, next);
+});
+
+app.get("/auth/me", async (c) => {
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("userId");
+	const userId = c.get("jwtPayload").sub as string;
 
 	const user = await db
 		.select({

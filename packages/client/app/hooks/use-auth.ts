@@ -1,39 +1,48 @@
 import { useEffect, useState } from "react";
 import { serverFetch } from "~/utils/fetch";
+import type { AuthUser } from "~/types/user";
 
-export function useMe() {
-	const [user, setUser] = useState<any>(null);
-	const [loading, setLoading] = useState(true);
+export function useAuth() {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
-	useEffect(() => {
-		const token = localStorage.getItem("token");
+    useEffect(() => {
+        const controller = new AbortController();
 
-		if (!token) {
-			setLoading(false);
-			return;
-		}
+        async function fetchMe() {
+            const token = localStorage.getItem("token");
 
-		serverFetch("/auth/me", {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
-			.then((res) => {
-				if (!res.ok) {
-					throw new Error("Unauthorized");
-				}
-				return res.json();
-			})
-			.then((data) => {
-				setUser(data);
-			})
-			.catch(() => {
-				setUser(null);
-			})
-			.finally(() => {
-				setLoading(false);
-			});
-	}, []);
+            if (!token) {
+                setIsLoading(false);
+                return;
+            }
 
-	return { user, loading };
+            try {
+                const res = await serverFetch("/auth/me", {
+                    signal: controller.signal,
+                });
+
+                if (!res.ok) {
+                    throw new Error("Unauthorized");
+                }
+
+                const data: AuthUser = await res.json();
+                setUser(data);
+            } catch (e) {
+                if (controller.signal.aborted) return; // 中断された場合は何もしない
+                console.error(e);
+                setError(e instanceof Error ? e : new Error("Unknown error"));
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchMe();
+
+        return () => controller.abort();
+    }, []);
+
+    return { user, isLoading, error };
 }
