@@ -11,13 +11,6 @@ export function useAuth() {
 		const controller = new AbortController();
 
 		async function fetchMe() {
-			const token = localStorage.getItem("token");
-
-			if (!token) {
-				setIsLoading(false);
-				return;
-			}
-
 			try {
 				const res = await serverFetch("/auth/me", {
 					signal: controller.signal,
