@@ -12,7 +12,6 @@ import {
 	questions as questionsTable,
 	users as usersTable,
 } from "./db/schema";
-import { authMiddleware } from "./middlewares/auth";
 
 const EXPIRED_DURATION = 60 * 60 * 48;
 
@@ -21,6 +20,14 @@ export const app = new Hono<{ Bindings: Env }>({});
 export type HonoEnv = {
 	Bindings: Env;
 };
+
+export const factory = createFactory<HonoEnv>();
+
+export const authMiddleware = factory.createMiddleware(async (c, next) => {
+	return jwt({
+		secret: c.env.JWT_SECRET,
+	})(c, next);
+});
 
 const registerSchema = v.object({
 	displayId: v.string(),
@@ -80,37 +87,6 @@ app.get("/users/:id", async (c) => {
 		console.error(e);
 		return c.json({ error: "User not found" }, 404);
 	}
-});
-
-export const factory = createFactory<HonoEnv>();
-
-export const authMeMiddleware = factory.createMiddleware(async (c, next) => {
-	return jwt({
-		secret: c.env.JWT_SECRET,
-	})(c, next);
-});
-
-app.get("/auth/me", authMeMiddleware, async (c) => {
-	const db = drizzle(c.env.DB);
-
-	const userId = c.get("jwtPayload").sub as string;
-
-	const user = await db
-		.select({
-			id: usersTable.id,
-			displayId: usersTable.displayId,
-			name: usersTable.name,
-			createdAt: usersTable.createdAt,
-		})
-		.from(usersTable)
-		.where(eq(usersTable.id, userId))
-		.get();
-
-	if (!user) {
-		return c.json({ error: "User not found" }, 404);
-	}
-
-	return c.json(user);
 });
 
 app.post("/api/register", vValidator("json", registerSchema), async (c) => {
@@ -178,6 +154,29 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
 		console.error(e);
 		return c.json({ error: "Login failed" }, 500);
 	}
+});
+
+app.get("/auth/me", authMiddleware, async (c) => {
+	const db = drizzle(c.env.DB);
+
+	const userId = c.get("jwtPayload").sub as string;
+
+	const user = await db
+		.select({
+			id: usersTable.id,
+			displayId: usersTable.displayId,
+			name: usersTable.name,
+			createdAt: usersTable.createdAt,
+		})
+		.from(usersTable)
+		.where(eq(usersTable.id, userId))
+		.get();
+
+	if (!user) {
+		return c.json({ error: "User not found" }, 404);
+	}
+
+	return c.json(user);
 });
 
 app.use("/questions/*", authMiddleware);
