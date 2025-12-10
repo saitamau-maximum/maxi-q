@@ -15,8 +15,15 @@ import { authMiddleware } from "./middleware/auth";
 
 const EXPIRED_DURATION = 60 * 60 * 48;
 
+type JwtPayload = {
+	sub: string;
+};
+
 export type HonoEnv = {
 	Bindings: Env;
+	Variables: {
+		jwtPayload: JwtPayload;
+	};
 };
 
 export const app = new Hono<HonoEnv>();
@@ -151,18 +158,7 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
 app.get("/auth/me", authMiddleware, async (c) => {
 	const db = drizzle(c.env.DB);
 
-	const payload = c.get("jwtPayload");
-
-	if (
-		!payload ||
-		typeof payload !== "object" ||
-		!("sub" in payload) ||
-		typeof payload.sub !== "string"
-	) {
-		return c.json({ error: "Invalid token payload" }, 401);
-	}
-
-	const userId = payload.sub;
+	const userId = c.get("jwtPayload").sub;
 
 	const user = await db
 		.select({
