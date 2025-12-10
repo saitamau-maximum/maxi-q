@@ -151,7 +151,18 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
 app.get("/auth/me", authMiddleware, async (c) => {
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub as string;
+	const payload = c.get("jwtPayload");
+
+	if (
+		!payload ||
+		typeof payload !== "object" ||
+		!("sub" in payload) ||
+		typeof payload.sub !== "string"
+	) {
+		return c.json({ error: "Invalid token payload" }, 401);
+	}
+
+	const userId = payload.sub;
 
 	const user = await db
 		.select({
