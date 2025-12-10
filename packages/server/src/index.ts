@@ -5,18 +5,18 @@ import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { sign } from "hono/jwt";
-import { authMiddleware } from "./middleware/auth";
 import * as v from "valibot";
 import {
 	answers as answersTable,
 	questions as questionsTable,
 	users as usersTable,
 } from "./db/schema";
+import { authMiddleware } from "./middleware/auth";
 
 const EXPIRED_DURATION = 60 * 60 * 48;
 
 export type HonoEnv = {
-  Bindings: Env;
+	Bindings: Env;
 };
 
 export const app = new Hono<HonoEnv>();
