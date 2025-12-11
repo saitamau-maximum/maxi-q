@@ -8,9 +8,9 @@ export default function LoginPage() {
 	const { login, error, isLoading } = useLogin();
 
 	const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(email, password);
-  };
+		e.preventDefault();
+		login(email, password);
+	};
 
 	return (
 		<div
