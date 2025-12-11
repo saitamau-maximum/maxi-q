@@ -1,38 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
-import { postRequest } from "../utils/fetch";
+import { useLogin } from "~/hooks/use-login";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [error, setError] = useState("");
-	const [isLoading, setIsLoading] = useState(false);
-	const navigate = useNavigate();
+	const { login, error, isLoading } = useLogin();
 
-	const handleLogin = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError("");
-		setIsLoading(true);
-
-		try {
-			const data = await postRequest<{ token: string }>("/login", {
-				email,
-				password,
-			});
-			localStorage.setItem("token", data.token);
-
-			navigate("/questions");
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-				setError(err.message);
-			} else {
-				setError("予期せぬエラーが発生しました");
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(email, password);
+  };
 
 	return (
 		<div
