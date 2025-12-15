@@ -48,6 +48,10 @@ const createAnswerSchema = v.object({
 	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
 });
 
+export const setBestAnswerSchema = v.object({
+	answerId: v.nullable(v.pipe(v.string(), v.uuid())),
+});
+
 app.use("*", cors());
 
 app.get("/", (c) => c.text("Hono!"));
@@ -279,6 +283,77 @@ app.post(
 		} catch (e) {
 			console.error(e);
 			return c.json({ error: "Failed to post answer" }, 500);
+		}
+	},
+);
+
+app.put(
+	"/questions/:id/best-answer",
+	vValidator("json", setBestAnswerSchema),
+	async (c) => {
+		const { id: questionId } = c.req.param();
+		const { answerId } = c.req.valid("json");
+
+		const db = drizzle(c.env.DB);
+
+		try {
+			await db.transaction(async (tx) => {
+				// 質問取得
+				const question = await tx
+					.select()
+					.from(questionsTable)
+					.where(eq(questionsTable.id, questionId))
+					.get();
+
+				if (!question) {
+					throw new Error("QUESTION_NOT_FOUND");
+				}
+
+				// 解除の場合
+				if (answerId === null) {
+					await tx
+						.update(questionsTable)
+						.set({
+							bestAnswerId: null,
+							solved: 0,
+							updatedAt: new Date(),
+						})
+						.where(eq(questionsTable.id, questionId));
+
+					return;
+				}
+
+				// answer 存在確認
+				const answer = await tx
+					.select()
+					.from(answersTable)
+					.where(eq(answersTable.id, answerId))
+					.get();
+
+				if (!answer) {
+					throw new Error("ANSWER_NOT_FOUND");
+				}
+
+				// question と answer の紐付け確認
+				if (answer.questionId !== questionId) {
+					throw new Error("ANSWER_NOT_BELONG_TO_QUESTION");
+				}
+
+				// ベストアンサー更新
+				await tx
+					.update(questionsTable)
+					.set({
+						bestAnswerId: answerId,
+						solved: 1,
+						updatedAt: new Date(),
+					})
+					.where(eq(questionsTable.id, questionId));
+			});
+
+			return c.json({ success: true }, 200);
+		} catch (e) {
+			console.error(e);
+			return c.json({ error: "Failed to update best answer" }, 500);
 		}
 	},
 );
