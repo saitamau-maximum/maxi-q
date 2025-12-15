@@ -1,13 +1,12 @@
-import { css } from "styled-system/css";
-import type { CreateUserParams, User } from "~/types/user";
-import { serverFetch } from "~/utils/fetch";
-import { useLogin } from "~/hooks/use-login";
 import { useNavigate } from "react-router";
+import { css } from "styled-system/css";
+import { useLogin } from "~/hooks/use-login";
+import type { CreateUserParams } from "~/types/user";
+import { serverFetch } from "~/utils/fetch";
 
 export default function RegisterPage() {
-	const {login, error: loginError, isLoading: isLoginLoading} = useLogin();
+	const { login, error: loginError } = useLogin();
 	const navigate = useNavigate();
-
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -117,21 +116,20 @@ export default function RegisterPage() {
 						})}
 					/>
 					<button
-					type="submit"
-					className={css({
-						width: "400px",
-						padding: "10px",
-						borderRadius: "4px",
-						border: "none",
-						backgroundColor: "green.500",
-						color: "white",
-						cursor: "pointer",
-					})}
-				>
-					作成
-				</button>
+						type="submit"
+						className={css({
+							width: "400px",
+							padding: "10px",
+							borderRadius: "4px",
+							border: "none",
+							backgroundColor: "green.500",
+							color: "white",
+							cursor: "pointer",
+						})}
+					>
+						作成
+					</button>
 				</form>
-				
 			</div>
 		</div>
 	);
