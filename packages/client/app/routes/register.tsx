@@ -1,22 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import type { CreateUserParams, User } from "~/types/user";
 import { serverFetch } from "~/utils/fetch";
+import { useLogin } from "~/hooks/use-login";
+import { useNavigate } from "react-router";
 
 export default function RegisterPage() {
-	const [_users, setUsers] = useState<User[]>([]);
-	const fetchUsers = useCallback(async () => {
-		try {
-			const response = await serverFetch("/users");
-			if (!response.ok) {
-				throw new Error("Failed to fetch users");
-			}
-			const users = await response.json();
-			setUsers(users);
-		} catch (error) {
-			console.error("Error fetching users:", error);
-		}
-	}, []);
+	const {login, error: loginError, isLoading: isLoginLoading} = useLogin();
+	const navigate = useNavigate();
+
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -29,7 +20,7 @@ export default function RegisterPage() {
 		};
 
 		try {
-			const response = await serverFetch("/users", {
+			const response = await serverFetch("/api/register", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -39,17 +30,15 @@ export default function RegisterPage() {
 			if (!response.ok) {
 				throw new Error("Failed to create user");
 			}
-			const newUser = await response.json();
-			console.log("User created:", newUser);
-			await fetchUsers();
+			await login(userParams.email, userParams.password);
+			if (loginError) {
+				throw new Error(loginError);
+			}
+			navigate("/timeline");
 		} catch (error) {
 			console.error("Error creating user:", error);
 		}
 	};
-
-	useEffect(() => {
-		fetchUsers();
-	}, [fetchUsers]);
 
 	return (
 		<div className={css({})}>
@@ -127,8 +116,7 @@ export default function RegisterPage() {
 							border: "1px solid #ccc",
 						})}
 					/>
-				</form>
-				<button
+					<button
 					type="submit"
 					className={css({
 						width: "400px",
@@ -142,6 +130,8 @@ export default function RegisterPage() {
 				>
 					作成
 				</button>
+				</form>
+				
 			</div>
 		</div>
 	);
