@@ -15,6 +15,7 @@ export const questions = table("questions", {
 	id: t.text("id").primaryKey(),
 	title: t.text("title").notNull(),
 	content: t.text("content").notNull(),
+	author_id: t.text("author_id").notNull().references(() => users.id),
 	createdAt: t
 		.integer("created_at", { mode: "timestamp" })
 		.notNull()
@@ -33,6 +34,7 @@ export const answers = table("answers", {
 		.notNull()
 		.references(() => questions.id),
 	content: t.text("content").notNull(),
+	author_id: t.text("author_id").notNull().references(() => users.id),
 	answeredAt: t
 		.integer("answered_at", { mode: "timestamp" })
 		.notNull()

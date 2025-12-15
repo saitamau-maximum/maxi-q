@@ -184,6 +184,8 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
+	const userId = c.get("jwtPayload").sub;
+
 	try {
 		const result = await db
 			.insert(questionsTable)
@@ -191,6 +193,7 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 				id: crypto.randomUUID(),
 				title,
 				content,
+				author_id: userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -218,7 +221,17 @@ app.get("/questions/:id", async (c) => {
 			return c.json({ error: "Question not found" }, 404);
 		}
 
-		return c.json(question, 200);
+		const userId = c.get("jwtPayload").sub;
+
+		const isAuthor = question.author_id === userId;
+
+        return c.json(
+            {
+                ...question,
+                isAuthor,
+            },
+            200
+        );
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch question" }, 500);
@@ -228,6 +241,7 @@ app.get("/questions/:id", async (c) => {
 app.get("/questions/:id/answers", async (c) => {
 	const { id: questionId } = c.req.param();
 	const db = drizzle(c.env.DB);
+	const userId = c.get("jwtPayload").sub;
 
 	try {
 		// 回答一覧取得
@@ -237,7 +251,12 @@ app.get("/questions/:id/answers", async (c) => {
 			.where(eq(answersTable.questionId, questionId))
 			.all();
 
-		return c.json(answers, 200);
+		const answersWithIsAuthor = answers.map((answer) => ({
+			...answer,
+			isAuthor: answer.author_id === userId,
+		}));
+
+		return c.json(answersWithIsAuthor, 200);
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch answers" }, 500);
@@ -250,6 +269,8 @@ app.post(
 	async (c) => {
 		const { id: questionId } = c.req.param();
 		const { content } = c.req.valid("json");
+
+		const userId = c.get("jwtPayload").sub;
 
 		const db = drizzle(c.env.DB);
 
@@ -270,6 +291,7 @@ app.post(
 					id: crypto.randomUUID(),
 					questionId: questionId,
 					content,
+					author_id: userId,
 					answeredAt: new Date(),
 					updatedAt: new Date(),
 				})
