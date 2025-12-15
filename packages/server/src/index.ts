@@ -210,6 +210,8 @@ app.get("/questions/:id", async (c) => {
 	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
 
+	const userId = c.get("jwtPayload").sub;
+
 	try {
 		const question = await db
 			.select()
@@ -220,8 +222,6 @@ app.get("/questions/:id", async (c) => {
 		if (!question) {
 			return c.json({ error: "Question not found" }, 404);
 		}
-
-		const userId = c.get("jwtPayload").sub;
 
 		const isAuthor = question.author_id === userId;
 
@@ -241,6 +241,7 @@ app.get("/questions/:id", async (c) => {
 app.get("/questions/:id/answers", async (c) => {
 	const { id: questionId } = c.req.param();
 	const db = drizzle(c.env.DB);
+	
 	const userId = c.get("jwtPayload").sub;
 
 	try {
