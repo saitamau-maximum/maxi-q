@@ -225,13 +225,13 @@ app.get("/questions/:id", async (c) => {
 
 		const isAuthor = question.author_id === userId;
 
-        return c.json(
-            {
-                ...question,
-                isAuthor,
-            },
-            200
-        );
+		return c.json(
+			{
+				...question,
+				isAuthor,
+			},
+			200,
+		);
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch question" }, 500);
