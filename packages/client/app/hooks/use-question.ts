@@ -11,10 +11,28 @@ export function postQuestion() {
 	return { post };
 }
 
-export function useQuestion(questionId?: string) {
+export function useQuestions(questionId?: string) {
 	const [question, setQuestion] = useState<Question | null>(null);
+	const [questions, setQuestions] = useState<Question[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
+
+	const fetchAllQuestions = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
+
+		try {
+			const res = await serverFetch(`/questions`);
+			if (!res.ok) throw new Error("Failed to fetch question");
+
+			setQuestions(await res.json());
+		} catch (err) {
+			console.error(err);
+			setError(err instanceof Error ? err : new Error("Unknown error"));
+		} finally {
+			setIsLoading(false);
+		}
+	},[]);
 
 	const fetchQuestion = useCallback(async () => {
 		if (!questionId) return;
@@ -36,8 +54,9 @@ export function useQuestion(questionId?: string) {
 	}, [questionId]);
 
 	useEffect(() => {
+		fetchAllQuestions();
 		fetchQuestion();
-	}, [fetchQuestion]);
+	}, [fetchQuestion, fetchAllQuestions]);
 
-	return { question, isLoading, error, refetch: fetchQuestion };
+	return { questions, question, isLoading, error, refetch: fetchQuestion };
 }

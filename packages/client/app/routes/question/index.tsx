@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
 import { useAnswers } from "~/hooks/use-answer";
-import { useQuestion } from "~/hooks/use-question";
+import { useQuestions } from "~/hooks/use-question";
 
 export default function QuestionDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -12,7 +12,7 @@ export default function QuestionDetailPage() {
 		question,
 		isLoading: questionLoading,
 		error: questionError,
-	} = useQuestion(id);
+	} = useQuestions(id);
 
 	const {
 		answers,
