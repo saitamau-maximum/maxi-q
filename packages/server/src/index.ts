@@ -287,91 +287,101 @@ app.post(
 	},
 );
 
+export const ErrorCode = {
+  QUESTION_NOT_FOUND: "QUESTION_NOT_FOUND",
+  ANSWER_NOT_FOUND: "ANSWER_NOT_FOUND",
+  ANSWER_NOT_BELONG_TO_QUESTION: "ANSWER_NOT_BELONG_TO_QUESTION",
+} as const;
+
 app.put(
-	"/questions/:id/solve",
-	vValidator("json", setBestAnswerSchema),
-	async (c) => {
-		const { id: questionId } = c.req.param();
-		const { answerId } = c.req.valid("json");
+  "/questions/:id/solve",
+  vValidator("json", setBestAnswerSchema),
+  async (c) => {
+    const { id: questionId } = c.req.param();
+    const { answerId } = c.req.valid("json");
 
-		const db = drizzle(c.env.DB);
+    const db = drizzle(c.env.DB);
 
-		try {
-			await db.transaction(async (tx) => {
-				// 質問取得
-				const question = await tx
-					.select()
-					.from(questionsTable)
-					.where(eq(questionsTable.id, questionId))
-					.get();
+    try {
+      await db.transaction(async (tx) => {
+        // 質問取得
+        const question = await tx
+          .select()
+          .from(questionsTable)
+          .where(eq(questionsTable.id, questionId))
+          .get();
 
-				if (!question) {
-					throw new Error("QUESTION_NOT_FOUND");
-				}
+        if (!question) {
+          throw new Error(ErrorCode.QUESTION_NOT_FOUND);
+        }
 
-				// 解除の場合
-				if (answerId === null) {
-					await tx
-						.update(questionsTable)
-						.set({
-							bestAnswerId: null,
-							solved: 0,
-							updatedAt: new Date(),
-						})
-						.where(eq(questionsTable.id, questionId));
+        // 解除の場合
+        if (answerId === null) {
+          await tx
+            .update(questionsTable)
+            .set({
+              bestAnswerId: null,
+              solved: 0,
+              updatedAt: new Date(),
+            })
+            .where(eq(questionsTable.id, questionId));
 
-					return;
-				}
+          return;
+        }
 
-				// answer 存在確認
-				const answer = await tx
-					.select()
-					.from(answersTable)
-					.where(eq(answersTable.id, answerId))
-					.get();
+        // answer 存在確認
+        const answer = await tx
+          .select()
+          .from(answersTable)
+          .where(eq(answersTable.id, answerId))
+          .get();
 
-				if (!answer) {
-					throw new Error("ANSWER_NOT_FOUND");
-				}
+        if (!answer) {
+          throw new Error(ErrorCode.ANSWER_NOT_FOUND);
+        }
 
-				// question と answer の紐付け確認
-				if (answer.questionId !== questionId) {
-					throw new Error("ANSWER_NOT_BELONG_TO_QUESTION");
-				}
+        if (answer.questionId !== questionId) {
+          throw new Error(ErrorCode.ANSWER_NOT_BELONG_TO_QUESTION);
+        }
 
-				// ベストアンサー更新
-				await tx
-					.update(questionsTable)
-					.set({
-						bestAnswerId: answerId,
-						solved: 1,
-						updatedAt: new Date(),
-					})
-					.where(eq(questionsTable.id, questionId));
-			});
+        // ベストアンサー更新
+        await tx
+          .update(questionsTable)
+          .set({
+            bestAnswerId: answerId,
+            solved: 1,
+            updatedAt: new Date(),
+          })
+          .where(eq(questionsTable.id, questionId));
+      });
 
-			return c.json({ success: true }, 200);
-		} catch (e) {
-			console.error(e);
-			if (e instanceof Error) {
-				switch (e.message) {
-					case "QUESTION_NOT_FOUND":
-						return c.json({ error: "Question not found" }, 404);
-					case "ANSWER_NOT_FOUND":
-						return c.json({ error: "Answer not found" }, 404);
-					case "ANSWER_NOT_BELONG_TO_QUESTION":
-						return c.json(
-							{ error: "Answer does not belong to the question" },
-							400,
-						);
-					default:
-						return c.json({ error: "Failed to update best answer" }, 500);
-				}
-			} else {
-				return c.json({ error: "Failed to update best answer" }, 500);
-			}
-		}
-	},
+      return c.json({ success: true }, 200);
+
+    } catch (e) {
+      console.error(e);
+
+      if (!(e instanceof Error)) {
+        return c.json({ error: "Failed to update best answer" }, 500);
+      }
+
+      switch (e.message) {
+        case ErrorCode.QUESTION_NOT_FOUND:
+          return c.json({ error: "Question not found" }, 404);
+
+        case ErrorCode.ANSWER_NOT_FOUND:
+          return c.json({ error: "Answer not found" }, 404);
+
+        case ErrorCode.ANSWER_NOT_BELONG_TO_QUESTION:
+          return c.json(
+            { error: "Answer does not belong to the question" },
+            400,
+          );
+          
+        default:
+          return c.json({ error: "Failed to update best answer" }, 500);
+      }
+    }
+  },
 );
 
 export default { fetch: app.fetch };
