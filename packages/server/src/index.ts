@@ -158,7 +158,7 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
 app.get("/auth/me", authMiddleware, async (c) => {
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub;
+	const { sub: userId } = c.get("jwtPayload");
 
 	const user = await db
 		.select({
@@ -184,7 +184,7 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub;
+	const { sub: userId } = c.get("jwtPayload");
 
 	try {
 		const result = await db
@@ -193,7 +193,7 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 				id: crypto.randomUUID(),
 				title,
 				content,
-				author_id: userId,
+				authorId: userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -210,7 +210,7 @@ app.get("/questions/:id", async (c) => {
 	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub;
+	const { sub: userId } = c.get("jwtPayload");
 
 	try {
 		const question = await db
@@ -223,7 +223,7 @@ app.get("/questions/:id", async (c) => {
 			return c.json({ error: "Question not found" }, 404);
 		}
 
-		const isAuthor = question.author_id === userId;
+		const isAuthor = question.authorId === userId;
 
 		return c.json(
 			{
@@ -242,7 +242,7 @@ app.get("/questions/:id/answers", async (c) => {
 	const { id: questionId } = c.req.param();
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub;
+	const { sub: userId } = c.get("jwtPayload");
 
 	try {
 		// 回答一覧取得
@@ -254,7 +254,7 @@ app.get("/questions/:id/answers", async (c) => {
 
 		const answersWithIsAuthor = answers.map((answer) => ({
 			...answer,
-			isAuthor: answer.author_id === userId,
+			isAuthor: answer.authorId === userId,
 		}));
 
 		return c.json(answersWithIsAuthor, 200);
@@ -271,7 +271,7 @@ app.post(
 		const { id: questionId } = c.req.param();
 		const { content } = c.req.valid("json");
 
-		const userId = c.get("jwtPayload").sub;
+		const { sub: userId } = c.get("jwtPayload");
 
 		const db = drizzle(c.env.DB);
 
@@ -292,7 +292,7 @@ app.post(
 					id: crypto.randomUUID(),
 					questionId: questionId,
 					content,
-					author_id: userId,
+					authorId: userId,
 					answeredAt: new Date(),
 					updatedAt: new Date(),
 				})
