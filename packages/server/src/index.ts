@@ -288,7 +288,7 @@ app.post(
 );
 
 app.put(
-	"/questions/:id/best-answer",
+	"/questions/:id/solve",
 	vValidator("json", setBestAnswerSchema),
 	async (c) => {
 		const { id: questionId } = c.req.param();
