@@ -5,6 +5,5 @@ CREATE TABLE questions (
     `best_answer_id` TEXT,
     `created_at` INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     `updated_at` INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-    `solved` INTEGER NOT NULL DEFAULT 0
-    FOREIGN KEY (best_answer_id) REFERENCES answers(answer_id)
+    `solved` INTEGER NOT NULL DEFAULT 0,
 );

@@ -48,7 +48,7 @@ const createAnswerSchema = v.object({
 	content: v.pipe(v.string(), v.minLength(1), v.maxLength(5000)),
 });
 
-export const setBestAnswerSchema = v.object({
+const setBestAnswerSchema = v.object({
 	answerId: v.nullable(v.pipe(v.string(), v.uuid())),
 });
 
@@ -353,7 +353,23 @@ app.put(
 			return c.json({ success: true }, 200);
 		} catch (e) {
 			console.error(e);
-			return c.json({ error: "Failed to update best answer" }, 500);
+			if (e instanceof Error) {
+				switch (e.message) {
+					case "QUESTION_NOT_FOUND":
+						return c.json({ error: "Question not found" }, 404);
+					case "ANSWER_NOT_FOUND":
+						return c.json({ error: "Answer not found" }, 404);
+					case "ANSWER_NOT_BELONG_TO_QUESTION":
+						return c.json(
+							{ error: "Answer does not belong to the question" },
+							400,
+						);
+					default:
+						return c.json({ error: "Failed to update best answer" }, 500);
+				}
+			} else {
+				return c.json({ error: "Failed to update best answer" }, 500);
+			}
 		}
 	},
 );
