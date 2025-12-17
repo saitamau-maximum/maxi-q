@@ -180,8 +180,6 @@ app.get("/auth/me", authMiddleware, async (c) => {
 
 app.use("/questions/*", authMiddleware);
 
-
-
 app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
@@ -209,10 +207,7 @@ app.get("/questions", async (c) => {
 	const db = drizzle(c.env.DB);
 
 	try {
-		const question = await db
-			.select()
-			.from(questionsTable)
-			.all();
+		const question = await db.select().from(questionsTable).all();
 
 		if (!question) {
 			return c.json({ error: "Question not found" }, 404);

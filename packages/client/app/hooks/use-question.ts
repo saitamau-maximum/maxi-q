@@ -32,7 +32,7 @@ export function useQuestions(questionId?: string) {
 		} finally {
 			setIsLoading(false);
 		}
-	},[]);
+	}, []);
 
 	const fetchQuestion = useCallback(async () => {
 		if (!questionId) return;
@@ -54,8 +54,8 @@ export function useQuestions(questionId?: string) {
 	}, [questionId]);
 
 	useEffect(() => {
-		fetchAllQuestions();
 		fetchQuestion();
+		fetchAllQuestions();
 	}, [fetchQuestion, fetchAllQuestions]);
 
 	return { questions, question, isLoading, error, refetch: fetchQuestion };
