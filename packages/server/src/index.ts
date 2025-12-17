@@ -162,7 +162,7 @@ app.post("/login", vValidator("json", loginUserSchema), async (c) => {
 app.get("/auth/me", authMiddleware, async (c) => {
 	const db = drizzle(c.env.DB);
 
-	const userId = c.get("jwtPayload").sub;
+	const { sub: userId } = c.get("jwtPayload");
 
 	const user = await db
 		.select({
@@ -188,6 +188,8 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	const { title, content } = c.req.valid("json");
 	const db = drizzle(c.env.DB);
 
+	const { sub: userId } = c.get("jwtPayload");
+
 	try {
 		const result = await db
 			.insert(questionsTable)
@@ -195,6 +197,7 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 				id: crypto.randomUUID(),
 				title,
 				content,
+				authorId: userId,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -211,6 +214,8 @@ app.get("/questions/:id", async (c) => {
 	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
 
+	const { sub: userId } = c.get("jwtPayload");
+
 	try {
 		const question = await db
 			.select()
@@ -222,7 +227,15 @@ app.get("/questions/:id", async (c) => {
 			return c.json({ error: "Question not found" }, 404);
 		}
 
-		return c.json(question, 200);
+		const isAuthor = question.authorId === userId;
+
+		return c.json(
+			{
+				...question,
+				isAuthor,
+			},
+			200,
+		);
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch question" }, 500);
@@ -233,6 +246,8 @@ app.get("/questions/:id/answers", async (c) => {
 	const { id: questionId } = c.req.param();
 	const db = drizzle(c.env.DB);
 
+	const { sub: userId } = c.get("jwtPayload");
+
 	try {
 		// 回答一覧取得
 		const answers = await db
@@ -241,7 +256,12 @@ app.get("/questions/:id/answers", async (c) => {
 			.where(eq(answersTable.questionId, questionId))
 			.all();
 
-		return c.json(answers, 200);
+		const answersWithIsAuthor = answers.map((answer) => ({
+			...answer,
+			isAuthor: answer.authorId === userId,
+		}));
+
+		return c.json(answersWithIsAuthor, 200);
 	} catch (e) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch answers" }, 500);
@@ -254,6 +274,8 @@ app.post(
 	async (c) => {
 		const { id: questionId } = c.req.param();
 		const { content } = c.req.valid("json");
+
+		const { sub: userId } = c.get("jwtPayload");
 
 		const db = drizzle(c.env.DB);
 
@@ -274,6 +296,7 @@ app.post(
 					id: crypto.randomUUID(),
 					questionId: questionId,
 					content,
+					authorId: userId,
 					answeredAt: new Date(),
 					updatedAt: new Date(),
 				})
