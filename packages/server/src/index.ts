@@ -326,7 +326,6 @@ app.put(
 		const db = drizzle(c.env.DB);
 
 		try {
-
 			const question = await db
 				.select()
 				.from(questionsTable)
@@ -338,7 +337,6 @@ app.put(
 			}
 
 			await db.transaction(async (tx) => {
-
 				// 解除の場合
 				if (answerId === null) {
 					await tx
