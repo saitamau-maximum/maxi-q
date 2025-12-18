@@ -326,17 +326,18 @@ app.put(
 		const db = drizzle(c.env.DB);
 
 		try {
-			await db.transaction(async (tx) => {
-				// 質問取得
-				const question = await tx
-					.select()
-					.from(questionsTable)
-					.where(eq(questionsTable.id, questionId))
-					.get();
 
-				if (!question) {
-					throw new Error(ErrorCode.QUESTION_NOT_FOUND);
-				}
+			const question = await db
+				.select()
+				.from(questionsTable)
+				.where(eq(questionsTable.id, questionId))
+				.get();
+
+			if (!question) {
+				throw new Error(ErrorCode.QUESTION_NOT_FOUND);
+			}
+
+			await db.transaction(async (tx) => {
 
 				// 解除の場合
 				if (answerId === null) {
