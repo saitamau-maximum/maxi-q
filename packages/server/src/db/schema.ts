@@ -15,6 +15,7 @@ export const questions = table("questions", {
 	id: t.text("id").primaryKey(),
 	title: t.text("title").notNull(),
 	content: t.text("content").notNull(),
+	bestAnswerId: t.text("best_answer_id"),
 	authorId: t
 		.text("author_id")
 		.notNull()
