@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
-
+import { useProfile } from "~/hooks/use-profile";
+import { serverFetch } from "~/utils/fetch";
 type User = {
 	id: string;
 	displayId: string;
@@ -10,75 +11,36 @@ type User = {
 };
 
 export default function ProfilePage() {
-	// 1. データ取得の状態管理 (useQuestion の代わり)
-	const [user, setUser] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<Error | null>(null);
-
-	// 2. フォーム送信の状態管理 (useAnswers の代わり)
+	const { user, setUser, isLoading, error } = useProfile();
+	// フォーム送信の状態管理 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [nameContent, setNameContent] = useState("");
 
-	useEffect(() => {
-		const fetchProfile = async () => {
-			try {
-				setIsLoading(true);
+  	useEffect(() => {
+    	if (user) setNameContent(user.name);
+  	}, [user]);
 
-				const token = localStorage.getItem("token");
+  	const handleUpdate = async () => {
+    if (!nameContent.trim()) return;
 
-				const res = await fetch("http://localhost:8787/auth/me", {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				});
+    try {
+      setIsSubmitting(true);
+      const res = await serverFetch("/auth/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameContent }),
+      });
 
-				if (!res.ok) {
-					throw new Error("Failed to fetch profile");
-				}
+      if (!res.ok) throw new Error("Failed to update profile");
 
-				const data: User = await res.json();
-				setUser(data);
-				setNameContent(data.name);
-			} catch (e) {
-				setError(e instanceof Error ? e : new Error("Unknown error"));
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchProfile();
-	}, []);
-
-	const handleUpdate = async () => {
-		if (!nameContent.trim()) return;
-
-		try {
-			setIsSubmitting(true);
-
-			const token = localStorage.getItem("token");
-
-			const res = await fetch("http://localhost:8787/auth/me", {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({ name: nameContent }),
-			});
-
-			if (!res.ok) {
-				throw new Error("Failed to update profile");
-			}
-
-			const updatedUser: User = await res.json();
-			setUser(updatedUser);
-			alert("Profile updated successfully!");
-		} catch (e) {
-			console.error("Failed to update", e);
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
+      const updatedUser = await res.json();
+      setUser(updatedUser);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
 	if (isLoading)
 		return <div className={css({ padding: "16px" })}>Loading profile...</div>;
@@ -93,7 +55,6 @@ export default function ProfilePage() {
 				padding: "16px",
 			})}
 		>
-			{/* プロフィール情報表示 */}
 			{user && (
 				<div
 					className={css({
@@ -115,7 +76,6 @@ export default function ProfilePage() {
 					</h1>
 
 					<div className={css({ marginBottom: "12px" })}>
-						{}
 						<p
 							className={css({
 								fontSize: "16px",
