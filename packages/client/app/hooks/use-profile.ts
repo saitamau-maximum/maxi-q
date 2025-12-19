@@ -1,6 +1,5 @@
-// hooks/useProfile.ts
-import { useState, useEffect } from "react";
-import { serverFetch } from "~/utils/fetch"; // さっきのファイルをインポート
+import { useCallback, useEffect, useState } from "react";
+import { serverFetch } from "~/utils/fetch";
 
 type User = {
 	id: string;
@@ -10,30 +9,29 @@ type User = {
 };
 
 export const useProfile = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+	const [user, setUser] = useState<User | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
 
-  const fetchProfile = async () => {
-    try {
-      setIsLoading(true);
-      const res = await serverFetch("/auth/me");
+	const fetchProfile = useCallback(async () => {
+		try {
+			setIsLoading(true);
+			const res = await serverFetch("/auth/me");
+			if (!res.ok) throw new Error("Failed to fetch profile");
 
-      if (!res.ok) throw new Error("Failed to fetch profile");
+			const data = await res.json();
+			setUser(data);
+			return data;
+		} catch (e) {
+			setError(e instanceof Error ? e : new Error("Unknown error"));
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
 
-      const data = await res.json();
-      setUser(data);
-      return data; 
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error("Unknown error"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+	useEffect(() => {
+		fetchProfile();
+	}, [fetchProfile]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  return { user, setUser, isLoading, error, refetch: fetchProfile };
+	return { user, setUser, isLoading, error, refetch: fetchProfile };
 };
