@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import type { User } from "~/types/user";
 import { serverFetch } from "~/utils/fetch";
-
-type User = {
-	id: string;
-	displayId: string;
-	name: string;
-	createdAt: string;
-};
 
 export const useProfile = () => {
 	const [user, setUser] = useState<User | null>(null);
