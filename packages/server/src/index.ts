@@ -210,6 +210,23 @@ app.post("/questions", vValidator("json", createQuestionSchema), async (c) => {
 	}
 });
 
+app.get("/questions", async (c) => {
+	const db = drizzle(c.env.DB);
+
+	try {
+		const question = await db.select().from(questionsTable).all();
+
+		if (!question) {
+			return c.json({ error: "Question not found" }, 404);
+		}
+
+		return c.json(question, 200);
+	} catch (e) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch question" }, 500);
+	}
+});
+
 app.get("/questions/:id", async (c) => {
 	const { id } = c.req.param();
 	const db = drizzle(c.env.DB);
