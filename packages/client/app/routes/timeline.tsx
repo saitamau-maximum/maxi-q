@@ -77,7 +77,7 @@ export default function TimelinePage() {
 						</span>
 						<span className={css({ marginLeft: "10px" })}>回答件数</span>
 						<span className={css({ marginLeft: "10px", color: "gray" })}>
-							{q.number_of_answer}件
+							{q.AnswerCount}件
 						</span>
 					</div>
 				</Link>
