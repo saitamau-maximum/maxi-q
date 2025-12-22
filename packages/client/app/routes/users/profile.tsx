@@ -2,44 +2,23 @@ import { useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
 import { useProfile } from "~/hooks/use-profile";
-import { serverFetch } from "~/utils/fetch";
 
 export default function ProfilePage() {
-	const { user, setUser, isLoading, error } = useProfile();
-	// フォーム送信の状態管理
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { user, isLoading, isSubmitting, error ,updateProfile} = useProfile();
 	const [nameContent, setNameContent] = useState("");
 
 	useEffect(() => {
 		if (user) setNameContent(user.name);
 	}, [user]);
 
-	const handleUpdate = async () => {
-		if (!nameContent.trim()) return;
-
-		try {
-			setIsSubmitting(true);
-			const res = await serverFetch("/auth/me", {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name: nameContent }),
-			});
-
-			if (!res.ok) throw new Error("Failed to update profile");
-
-			const updatedUser = await res.json();
-			setUser(updatedUser);
-		} catch (e) {
-			console.error(e);
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
 	if (isLoading)
 		return <div className={css({ padding: "16px" })}>Loading profile...</div>;
 
 	if (error) return <ErrorMessage message={error.message} />;
+
+	const handleUpdate = async () => {
+		await updateProfile(nameContent);
+	};
 
 	return (
 		<div
@@ -87,7 +66,7 @@ export default function ProfilePage() {
 				</div>
 			)}
 
-			{/* 編集フォーム*/}
+			{/* 編集フォーム */}
 			<h2
 				className={css({
 					fontSize: "20px",
