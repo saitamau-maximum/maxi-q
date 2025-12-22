@@ -21,7 +21,7 @@ export default function TimelinePage() {
 			>
 				<p>maxi-Q 質問一覧</p>
 				<p>question list</p>
-		  	</div>
+			</div>
 
 			{questions.map((q) => (
 				<Link
