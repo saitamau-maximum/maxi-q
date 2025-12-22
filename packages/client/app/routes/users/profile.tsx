@@ -4,7 +4,7 @@ import ErrorMessage from "~/components/error-message";
 import { useProfile } from "~/hooks/use-profile";
 
 export default function ProfilePage() {
-	const { user, isLoading, isSubmitting, error ,updateProfile} = useProfile();
+	const { user, isLoading, isSubmitting, error, updateProfile } = useProfile();
 	const [nameContent, setNameContent] = useState("");
 
 	useEffect(() => {
