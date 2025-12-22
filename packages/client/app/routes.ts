@@ -16,7 +16,7 @@ export default [
 		route("timeline", "routes/timeline.tsx"),
 
 		...prefix("users", [
-			route("me/posts", "routes/users/me/posts.tsx"),
+			route("profile", "routes/users/profile.tsx"),
 			route(":id/answers", "routes/users/:id/answers.tsx"),
 		]),
 
