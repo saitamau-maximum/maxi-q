@@ -10,5 +10,5 @@ export type Question = {
 	createdAt: string;
 	updatedAt: string;
 	solved: number;
-	number_of_answer: string;
+	AnswerCount: string;
 };
