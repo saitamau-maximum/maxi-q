@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { useLogin } from "~/hooks/use-login";
 import type { CreateUserParams } from "~/types/user";
@@ -129,6 +129,45 @@ export default function RegisterPage() {
 					>
 						作成
 					</button>
+
+					<div
+						className={css({
+							mt: "6",
+							textAlign: "center",
+							fontSize: "14px",
+							color: "#6b6b6b",
+						})}
+					>
+						<p>
+							既にアカウントをお持ちの方は
+							<Link
+								to="/login"
+								className={css({
+									color: "#2563eb",
+									fontWeight: "medium",
+									ml: "1",
+									_hover: {
+										textDecoration: "underline",
+									},
+								})}
+							>
+								ログイン
+							</Link>
+						</p>
+						<Link
+							to="/"
+							className={css({
+								display: "inline-block",
+								mt: "3",
+								color: "#9ca3af",
+								_hover: {
+									color: "#4b5563",
+								},
+							})}
+						>
+							ホームに戻る
+						</Link>
+					</div>
 				</form>
 			</div>
 		</div>

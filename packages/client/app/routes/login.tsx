@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { useLogin } from "~/hooks/use-login";
 
@@ -173,6 +174,45 @@ export default function LoginPage() {
 						{isLoading ? "ログイン中..." : "ログイン"}
 					</button>
 				</form>
+
+				<div
+					className={css({
+						mt: "6",
+						textAlign: "center",
+						fontSize: "sm",
+						color: "gray.600",
+					})}
+				>
+					<p>
+						アカウントをお持ちでない方は
+						<Link
+							to="/register"
+							className={css({
+								color: "blue.600",
+								fontWeight: "medium",
+								ml: "1",
+								_hover: {
+									textDecoration: "underline",
+								},
+							})}
+						>
+							新規登録
+						</Link>
+					</p>
+					<Link
+						to="/"
+						className={css({
+							display: "inline-block",
+							mt: "3",
+							color: "gray.500",
+							_hover: {
+								color: "gray.700",
+							},
+						})}
+					>
+						ホームに戻る
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
