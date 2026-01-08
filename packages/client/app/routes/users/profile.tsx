@@ -3,6 +3,7 @@ import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { Loading } from "~/components/ui/loading";
 import { useProfile } from "~/hooks/use-profile";
 
 export default function ProfilePage() {
@@ -13,12 +14,7 @@ export default function ProfilePage() {
 		if (user) setNameContent(user.name);
 	}, [user]);
 
-	if (isLoading)
-		return (
-			<div className={css({ padding: "24px", color: "#6b6b6b" })}>
-				Loading profile...
-			</div>
-		);
+	if (isLoading) return <Loading message="プロフィールを読み込み中..." />;
 
 	if (error) return <ErrorMessage message={error.message} />;
 

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
 import { Button } from "~/components/ui/button";
+import { Loading } from "~/components/ui/loading";
 import { Textarea } from "~/components/ui/textarea";
 import { useAnswers } from "~/hooks/use-answer";
 import { useQuestions } from "~/hooks/use-question";
@@ -30,7 +31,7 @@ export default function QuestionDetailPage() {
 		return <ErrorMessage message="Question ID is missing" />;
 	}
 
-	if (questionLoading) return <div>Loading question...</div>;
+	if (questionLoading) return <Loading message="質問を読み込み中..." />;
 	if (questionError) return <ErrorMessage message={questionError.message} />;
 
 	return (

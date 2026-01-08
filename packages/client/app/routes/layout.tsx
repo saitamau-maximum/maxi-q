@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import Header from "~/components/header";
+import { Loading } from "~/components/ui/loading";
 import { useAuth } from "~/hooks/use-auth";
 
 // TODO ログインしていなくてリダイレクトされたときにUIエラーを出す。
@@ -19,7 +20,7 @@ export default function ProtectedLayout() {
 		return (
 			<>
 				<Header />
-				<div style={{ padding: "20px" }}>Loading...</div>
+				<Loading />
 			</>
 		);
 	}
@@ -28,10 +29,7 @@ export default function ProtectedLayout() {
 		return (
 			<>
 				<Header />
-				<div style={{ padding: "20px", color: "red" }}>
-					<h2>エラーが発生しました</h2>
-					<p>{error.message}</p>
-				</div>
+				<Loading message={`エラー: ${error.message}`} />
 			</>
 		);
 	}
