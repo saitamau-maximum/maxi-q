@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
 import { useAnswers } from "~/hooks/use-answer";
@@ -39,6 +39,22 @@ export default function QuestionDetailPage() {
 				padding: "16px",
 			})}
 		>
+			<Link
+				to="/timeline"
+				className={css({
+					display: "inline-block",
+					marginBottom: "16px",
+					color: "#666",
+					fontSize: "14px",
+					textDecoration: "none",
+					_hover: {
+						color: "#333",
+					},
+				})}
+			>
+				&larr; 一覧に戻る
+			</Link>
+
 			{question && (
 				<div
 					className={css({

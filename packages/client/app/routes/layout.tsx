@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
+import Header from "~/components/header";
 import { useAuth } from "~/hooks/use-auth";
 
 // TODO ログインしていなくてリダイレクトされたときにUIエラーを出す。
@@ -28,7 +29,12 @@ export default function ProtectedLayout() {
 	}
 
 	if (user) {
-		return <Outlet />;
+		return (
+			<>
+				<Header />
+				<Outlet />
+			</>
+		);
 	}
 
 	return null;

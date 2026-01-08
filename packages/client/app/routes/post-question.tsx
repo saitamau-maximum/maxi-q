@@ -1,10 +1,12 @@
 import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { postQuestion } from "../hooks/use-question";
 
 export default function QuestionsPage() {
 	const formRef = useRef<HTMLFormElement>(null);
 	const { post } = postQuestion();
+	const navigate = useNavigate();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,6 +29,7 @@ export default function QuestionsPage() {
 			console.log("Question created!", newQuestion);
 
 			formRef.current?.reset();
+			navigate("/timeline");
 		} catch (err) {
 			console.error("質問投稿に失敗しました", err);
 		} finally {
@@ -100,20 +103,44 @@ export default function QuestionsPage() {
 					/>
 				</label>
 
-				<button
-					type="submit"
-					disabled={isSubmitting}
+				<div
 					className={css({
-						padding: "10px 16px",
-						background: isSubmitting ? "#999" : "#333",
-						color: "white",
-						borderRadius: "4px",
-						cursor: isSubmitting ? "not-allowed" : "pointer",
-						_hover: { background: isSubmitting ? "#999" : "#555" },
+						display: "flex",
+						gap: "12px",
 					})}
 				>
-					{isSubmitting ? "投稿中..." : "質問を投稿"}
-				</button>
+					<button
+						type="submit"
+						disabled={isSubmitting}
+						className={css({
+							padding: "10px 16px",
+							background: isSubmitting ? "#999" : "#333",
+							color: "white",
+							borderRadius: "4px",
+							cursor: isSubmitting ? "not-allowed" : "pointer",
+							_hover: { background: isSubmitting ? "#999" : "#555" },
+						})}
+					>
+						{isSubmitting ? "投稿中..." : "質問を投稿"}
+					</button>
+
+					<Link
+						to="/timeline"
+						className={css({
+							padding: "10px 16px",
+							color: "#666",
+							backgroundColor: "#fff",
+							border: "1px solid #d4d4d4",
+							borderRadius: "4px",
+							textDecoration: "none",
+							_hover: {
+								backgroundColor: "#f5f5f5",
+							},
+						})}
+					>
+						キャンセル
+					</Link>
+				</div>
 			</form>
 		</div>
 	);
