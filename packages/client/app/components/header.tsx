@@ -1,5 +1,15 @@
 import { Link, useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { Button } from "~/components/ui/button";
+
+const navLinkStyles = css({
+	color: "#4a4a4a",
+	textDecoration: "none",
+	fontSize: "14px",
+	_hover: {
+		color: "#1a1a1a",
+	},
+});
 
 export default function Header() {
 	const navigate = useNavigate();
@@ -42,68 +52,21 @@ export default function Header() {
 					gap: "24px",
 				})}
 			>
-				<Link
-					to="/timeline"
-					className={css({
-						color: "#4a4a4a",
-						textDecoration: "none",
-						fontSize: "14px",
-						_hover: {
-							color: "#1a1a1a",
-						},
-					})}
-				>
+				<Link to="/timeline" className={navLinkStyles}>
 					タイムライン
 				</Link>
 
-				<Link
-					to="/post/question"
-					className={css({
-						color: "#4a4a4a",
-						textDecoration: "none",
-						fontSize: "14px",
-						_hover: {
-							color: "#1a1a1a",
-						},
-					})}
-				>
+				<Link to="/post/question" className={navLinkStyles}>
 					質問投稿
 				</Link>
 
-				<Link
-					to="/users/profile"
-					className={css({
-						color: "#4a4a4a",
-						textDecoration: "none",
-						fontSize: "14px",
-						_hover: {
-							color: "#1a1a1a",
-						},
-					})}
-				>
+				<Link to="/users/profile" className={navLinkStyles}>
 					マイページ
 				</Link>
 
-				<button
-					type="button"
-					onClick={handleLogout}
-					className={css({
-						padding: "6px 12px",
-						fontSize: "14px",
-						color: "#4a4a4a",
-						backgroundColor: "transparent",
-						border: "1px solid #d4d4d4",
-						borderRadius: "4px",
-						cursor: "pointer",
-						transition: "all 0.2s",
-						_hover: {
-							backgroundColor: "#f5f5f5",
-							borderColor: "#a3a3a3",
-						},
-					})}
-				>
+				<Button variant="secondary" size="sm" onClick={handleLogout}>
 					ログアウト
-				</button>
+				</Button>
 			</nav>
 		</header>
 	);

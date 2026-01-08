@@ -1,5 +1,5 @@
-import { Link } from "react-router";
 import { css } from "styled-system/css";
+import { Button } from "~/components/ui/button";
 
 export default function Home() {
 	return (
@@ -40,45 +40,13 @@ export default function Home() {
 					gap: "16px",
 				})}
 			>
-				<Link
-					to="/login"
-					className={css({
-						padding: "12px 32px",
-						fontSize: "16px",
-						fontWeight: "bold",
-						color: "#fff",
-						backgroundColor: "#1a1a1a",
-						borderRadius: "6px",
-						textDecoration: "none",
-						transition: "background-color 0.2s",
-						_hover: {
-							backgroundColor: "#333",
-						},
-					})}
-				>
+				<Button as="link" to="/login" size="lg">
 					ログイン
-				</Link>
+				</Button>
 
-				<Link
-					to="/register"
-					className={css({
-						padding: "12px 32px",
-						fontSize: "16px",
-						fontWeight: "bold",
-						color: "#1a1a1a",
-						backgroundColor: "#fff",
-						border: "1px solid #d4d4d4",
-						borderRadius: "6px",
-						textDecoration: "none",
-						transition: "all 0.2s",
-						_hover: {
-							backgroundColor: "#f5f5f5",
-							borderColor: "#a3a3a3",
-						},
-					})}
-				>
+				<Button as="link" to="/register" variant="secondary" size="lg">
 					新規登録
-				</Link>
+				</Button>
 			</div>
 		</div>
 	);

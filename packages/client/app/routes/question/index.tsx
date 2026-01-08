@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
 import { useAnswers } from "~/hooks/use-answer";
 import { useQuestions } from "~/hooks/use-question";
 
@@ -36,7 +38,7 @@ export default function QuestionDetailPage() {
 			className={css({
 				maxWidth: "800px",
 				margin: "0 auto",
-				padding: "16px",
+				padding: "24px",
 			})}
 		>
 			<Link
@@ -44,11 +46,11 @@ export default function QuestionDetailPage() {
 				className={css({
 					display: "inline-block",
 					marginBottom: "16px",
-					color: "#666",
+					color: "#6b6b6b",
 					fontSize: "14px",
 					textDecoration: "none",
 					_hover: {
-						color: "#333",
+						color: "#1a1a1a",
 					},
 				})}
 			>
@@ -58,17 +60,19 @@ export default function QuestionDetailPage() {
 			{question && (
 				<div
 					className={css({
-						padding: "16px",
+						padding: "20px",
 						borderRadius: "8px",
-						border: "1px solid #ddd",
-						marginBottom: "20px",
+						border: "1px solid #e5e5e5",
+						marginBottom: "24px",
+						backgroundColor: "#fff",
 					})}
 				>
 					<h1
 						className={css({
 							fontSize: "24px",
 							fontWeight: "bold",
-							marginBottom: "8px",
+							marginBottom: "12px",
+							color: "#1a1a1a",
 						})}
 					>
 						{question.title}
@@ -78,6 +82,7 @@ export default function QuestionDetailPage() {
 						className={css({
 							fontSize: "16px",
 							lineHeight: "1.6",
+							color: "#4a4a4a",
 						})}
 					>
 						{question.content}
@@ -87,11 +92,13 @@ export default function QuestionDetailPage() {
 
 			<h2
 				className={css({
-					fontSize: "20px",
-					marginBottom: "8px",
+					fontSize: "18px",
+					fontWeight: "bold",
+					marginBottom: "12px",
+					color: "#1a1a1a",
 				})}
 			>
-				Answers
+				回答一覧
 			</h2>
 
 			{answersError && <ErrorMessage message={answersError.message} />}
@@ -101,29 +108,32 @@ export default function QuestionDetailPage() {
 					display: "flex",
 					flexDirection: "column",
 					gap: "12px",
-					marginBottom: "24px",
+					marginBottom: "32px",
 				})}
 			>
 				{answersLoading ? (
-					<p>Loading answers...</p>
+					<p className={css({ color: "#6b6b6b" })}>読み込み中...</p>
 				) : answers.length === 0 ? (
-					<p>No answers yet.</p>
+					<p className={css({ color: "#6b6b6b" })}>まだ回答はありません</p>
 				) : (
 					answers.map((ans) => (
 						<div
 							key={ans.id}
 							className={css({
-								padding: "12px",
-								border: "1px solid #ddd",
+								padding: "16px",
+								border: "1px solid #e5e5e5",
 								borderRadius: "6px",
+								backgroundColor: "#fff",
 							})}
 						>
-							<p>{ans.content}</p>
+							<p className={css({ color: "#1a1a1a", lineHeight: "1.6" })}>
+								{ans.content}
+							</p>
 							<p
 								className={css({
 									fontSize: "12px",
-									color: "gray",
-									marginTop: "4px",
+									color: "#a3a3a3",
+									marginTop: "8px",
 								})}
 							>
 								{new Date(ans.answeredAt).toLocaleString()}
@@ -148,46 +158,16 @@ export default function QuestionDetailPage() {
 					gap: "12px",
 				})}
 			>
-				<label
-					htmlFor="answer"
-					className={css({
-						fontWeight: "bold",
-						fontSize: "14px",
-					})}
-				>
-					あなたの回答
-				</label>
-
-				<textarea
-					id="answer"
-					className={css({
-						padding: "12px",
-						border: "1px solid #ccc",
-						borderRadius: "6px",
-						height: "120px",
-						resize: "vertical",
-					})}
+				<Textarea
+					label="あなたの回答"
 					value={answerContent}
 					onChange={(e) => setAnswerContent(e.target.value)}
-					placeholder="Write your answer..."
+					placeholder="回答を入力してください..."
 				/>
 
-				<button
-					type="submit"
-					disabled={submitting}
-					aria-disabled={submitting}
-					className={css({
-						padding: "12px",
-						backgroundColor: submitting ? "gray.400" : "blue.500",
-						color: "white",
-						borderRadius: "6px",
-						cursor: submitting ? "not-allowed" : "pointer",
-						fontSize: "16px",
-						fontWeight: "bold",
-					})}
-				>
-					{submitting ? "Posting..." : "Post Answer"}
-				</button>
+				<Button type="submit" disabled={submitting}>
+					{submitting ? "投稿中..." : "回答を投稿"}
+				</Button>
 			</form>
 		</div>
 	);

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import ErrorMessage from "~/components/error-message";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { useProfile } from "~/hooks/use-profile";
 
 export default function ProfilePage() {
@@ -12,7 +14,11 @@ export default function ProfilePage() {
 	}, [user]);
 
 	if (isLoading)
-		return <div className={css({ padding: "16px" })}>Loading profile...</div>;
+		return (
+			<div className={css({ padding: "24px", color: "#6b6b6b" })}>
+				Loading profile...
+			</div>
+		);
 
 	if (error) return <ErrorMessage message={error.message} />;
 
@@ -23,9 +29,9 @@ export default function ProfilePage() {
 	return (
 		<div
 			className={css({
-				maxWidth: "800px",
+				maxWidth: "600px",
 				margin: "0 auto",
-				padding: "16px",
+				padding: "24px",
 			})}
 		>
 			{user && (
@@ -33,7 +39,7 @@ export default function ProfilePage() {
 					className={css({
 						padding: "24px",
 						borderRadius: "8px",
-						border: "1px solid #e2e8f0",
+						border: "1px solid #e5e5e5",
 						marginBottom: "32px",
 						backgroundColor: "#fff",
 					})}
@@ -42,102 +48,91 @@ export default function ProfilePage() {
 						className={css({
 							fontSize: "24px",
 							fontWeight: "bold",
-							marginBottom: "16px",
+							marginBottom: "20px",
+							color: "#1a1a1a",
 						})}
 					>
-						My Profile
+						マイプロフィール
 					</h1>
 
 					<div className={css({ marginBottom: "12px" })}>
 						<p
 							className={css({
-								fontSize: "16px",
-								lineHeight: "1.6",
-								marginBottom: "8px",
+								fontSize: "14px",
+								color: "#6b6b6b",
+								marginBottom: "4px",
 							})}
 						>
-							<strong>ID:</strong> {user.id}
+							ID
 						</p>
+						<p
+							className={css({
+								fontSize: "16px",
+								color: "#1a1a1a",
+							})}
+						>
+							{user.id}
+						</p>
+					</div>
 
-						<p className={css({ fontSize: "16px", lineHeight: "1.6" })}>
-							<strong>Display ID:</strong> {user.displayId}
+					<div>
+						<p
+							className={css({
+								fontSize: "14px",
+								color: "#6b6b6b",
+								marginBottom: "4px",
+							})}
+						>
+							ユーザーID
+						</p>
+						<p
+							className={css({
+								fontSize: "16px",
+								color: "#1a1a1a",
+							})}
+						>
+							{user.displayId}
 						</p>
 					</div>
 				</div>
 			)}
 
-			{/* 編集フォーム */}
-			<h2
-				className={css({
-					fontSize: "20px",
-					fontWeight: "bold",
-					marginBottom: "16px",
-					borderBottom: "1px solid #e2e8f0",
-					paddingBottom: "8px",
-				})}
-			>
-				Edit Profile
-			</h2>
-
 			<div
 				className={css({
 					padding: "24px",
-					border: "1px solid #e2e8f0",
+					border: "1px solid #e5e5e5",
 					borderRadius: "8px",
 					backgroundColor: "#fff",
 				})}
 			>
-				<h3
+				<h2
 					className={css({
 						fontSize: "18px",
 						fontWeight: "bold",
-						marginBottom: "12px",
+						marginBottom: "20px",
+						color: "#1a1a1a",
 					})}
 				>
-					Display Name
-				</h3>
+					プロフィール編集
+				</h2>
 
-				<input
-					type="text"
-					value={nameContent}
-					onChange={(e) => setNameContent(e.target.value)}
-					placeholder="Enter your name"
-					disabled={isSubmitting}
-					className={css({
-						width: "100%",
-						padding: "12px",
-						border: "1px solid #cbd5e1",
-						borderRadius: "6px",
-						marginBottom: "12px",
-						outline: "none",
-						fontSize: "16px",
-						_focus: {
-							borderColor: "#3b82f6",
-							boxShadow: "0 0 0 1px #3b82f6",
-						},
-					})}
-				/>
+				<div className={css({ marginBottom: "16px" })}>
+					<Input
+						label="表示名"
+						type="text"
+						value={nameContent}
+						onChange={(e) => setNameContent(e.target.value)}
+						placeholder="表示名を入力"
+						disabled={isSubmitting}
+					/>
+				</div>
 
-				<button
-					type="button"
+				<Button
 					onClick={handleUpdate}
 					disabled={isSubmitting || !nameContent.trim()}
-					className={css({
-						padding: "10px 20px",
-						backgroundColor: isSubmitting ? "#94a3b8" : "#2563eb",
-						color: "white",
-						fontWeight: "bold",
-						borderRadius: "6px",
-						cursor: isSubmitting ? "not-allowed" : "pointer",
-						transition: "background-color 0.2s",
-						border: "none",
-						_hover: {
-							backgroundColor: isSubmitting ? "#94a3b8" : "#1d4ed8",
-						},
-					})}
 				>
-					{isSubmitting ? "Updating..." : "Update Profile"}
-				</button>
+					{isSubmitting ? "更新中..." : "更新する"}
+				</Button>
 			</div>
 		</div>
 	);

@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { useLogin } from "~/hooks/use-login";
 import type { CreateUserParams } from "~/types/user";
 import { serverFetch } from "~/utils/fetch";
@@ -40,135 +42,123 @@ export default function RegisterPage() {
 	};
 
 	return (
-		<div className={css({})}>
+		<div
+			className={css({
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+				minHeight: "100vh",
+				backgroundColor: "#fafafa",
+			})}
+		>
 			<div
 				className={css({
-					margin: "100px auto",
-					maxWidth: "700px",
-					display: "flex",
-					flexDirection: "column",
-					justifyContent: "center",
-					alignItems: "center",
-					gap: "40px",
+					padding: "32px",
+					backgroundColor: "#fff",
+					borderRadius: "8px",
+					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+					width: "100%",
+					maxWidth: "400px",
 				})}
 			>
+				<h1
+					className={css({
+						textAlign: "center",
+						marginBottom: "24px",
+						fontSize: "24px",
+						fontWeight: "bold",
+						color: "#1a1a1a",
+					})}
+				>
+					新規登録
+				</h1>
+
 				<form
-					onSubmit={(e) => handleSubmit(e)}
+					onSubmit={handleSubmit}
 					className={css({
 						display: "flex",
 						flexDirection: "column",
-						gap: "8px",
-						width: "400px",
+						gap: "16px",
 					})}
 				>
-					<h2
-						className={css({
-							fontSize: "30px",
-							fontWeight: "bold",
-							textAlign: "center",
-						})}
-					>
-						新規作成
-					</h2>
-					<div>ユーザーID</div>
-					<input
+					<Input
+						label="ユーザーID"
 						type="text"
 						name="displayId"
 						required
-						className={css({
-							padding: "8px",
-							borderRadius: "4px",
-							border: "1px solid #ccc",
-						})}
+						placeholder="your_id"
 					/>
-					<div>氏名</div>
-					<input
+
+					<Input
+						label="氏名"
 						type="text"
 						name="name"
 						required
-						className={css({
-							padding: "8px",
-							borderRadius: "4px",
-							border: "1px solid #ccc",
-						})}
+						placeholder="山田 太郎"
 					/>
-					<div>メールアドレス</div>
-					<input
+
+					<Input
+						label="メールアドレス"
 						type="email"
 						name="email"
-						placeholder="example@example.com"
 						required
-						className={css({
-							padding: "8px",
-							borderRadius: "4px",
-							border: "1px solid #ccc",
-						})}
+						placeholder="example@example.com"
 					/>
-					<div>パスワード</div>
-					<input
+
+					<Input
+						label="パスワード"
 						type="password"
 						name="password"
 						required
-						className={css({
-							padding: "8px",
-							borderRadius: "4px",
-							border: "1px solid #ccc",
-						})}
+						placeholder="8文字以上"
 					/>
-					<button
-						type="submit"
-						className={css({
-							width: "400px",
-							padding: "10px",
-							borderRadius: "4px",
-							border: "none",
-							backgroundColor: "green.500",
-							color: "white",
-							cursor: "pointer",
-						})}
-					>
-						作成
-					</button>
 
-					<div
-						className={css({
-							mt: "6",
-							textAlign: "center",
-							fontSize: "14px",
-							color: "#6b6b6b",
-						})}
+					<Button
+						type="submit"
+						className={css({ width: "100%", marginTop: "8px" })}
 					>
-						<p>
-							既にアカウントをお持ちの方は
-							<Link
-								to="/login"
-								className={css({
-									color: "#2563eb",
-									fontWeight: "medium",
-									ml: "1",
-									_hover: {
-										textDecoration: "underline",
-									},
-								})}
-							>
-								ログイン
-							</Link>
-						</p>
+						登録
+					</Button>
+				</form>
+
+				<div
+					className={css({
+						marginTop: "24px",
+						textAlign: "center",
+						fontSize: "14px",
+						color: "#6b6b6b",
+					})}
+				>
+					<p>
+						既にアカウントをお持ちの方は
 						<Link
-							to="/"
+							to="/login"
 							className={css({
-								display: "inline-block",
-								mt: "3",
-								color: "#9ca3af",
+								color: "#1a1a1a",
+								fontWeight: "medium",
+								marginLeft: "4px",
 								_hover: {
-									color: "#4b5563",
+									textDecoration: "underline",
 								},
 							})}
 						>
-							ホームに戻る
+							ログイン
 						</Link>
-					</div>
-				</form>
+					</p>
+					<Link
+						to="/"
+						className={css({
+							display: "inline-block",
+							marginTop: "12px",
+							color: "#a3a3a3",
+							_hover: {
+								color: "#4a4a4a",
+							},
+						})}
+					>
+						ホームに戻る
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
