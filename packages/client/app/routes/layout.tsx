@@ -16,15 +16,23 @@ export default function ProtectedLayout() {
 	}, [isLoading, user, navigate]);
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return (
+			<>
+				<Header />
+				<div style={{ padding: "20px" }}>Loading...</div>
+			</>
+		);
 	}
 
 	if (error) {
 		return (
-			<div style={{ padding: "20px", color: "red" }}>
-				<h2>エラーが発生しました</h2>
-				<p>{error.message}</p>
-			</div>
+			<>
+				<Header />
+				<div style={{ padding: "20px", color: "red" }}>
+					<h2>エラーが発生しました</h2>
+					<p>{error.message}</p>
+				</div>
+			</>
 		);
 	}
 
