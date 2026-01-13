@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { css } from "styled-system/css";
+import ErrorMessage from "~/components/error-message";
+import { Loading } from "~/components/ui/loading";
 import { useQuestions } from "../hooks/use-question";
 
 export default function TimelinePage() {
 	const { questions, isLoading, error } = useQuestions();
 
-	if (isLoading) return <p>Loading...</p>;
-	if (error) return <p>Error: {error.message}</p>;
-	if (!questions) return <p>No questions found</p>;
+	if (isLoading) return <Loading message="質問一覧を読み込み中..." />;
+	if (error) return <ErrorMessage message={error.message} />;
+	if (!questions) return <Loading message="質問が見つかりません" />;
 
 	return (
 		<div>

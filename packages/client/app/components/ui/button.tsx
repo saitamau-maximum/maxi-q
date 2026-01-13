@@ -92,5 +92,7 @@ export function Button({
 	}
 
 	const { as: _, ...buttonProps } = props;
-	return <button type="button" className={combinedClassName} {...buttonProps} />;
+	return (
+		<button type="button" className={combinedClassName} {...buttonProps} />
+	);
 }
