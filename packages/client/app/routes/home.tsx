@@ -1,37 +1,53 @@
-import { useState } from "react";
 import { css } from "styled-system/css";
-import type { User } from "~/types/user";
-
-// export function meta({}: Route.MetaArgs) {
-//   return [
-//     { title: "New React Router App" },
-//     { name: "description", content: "Welcome to React Router!" },
-//   ];
-// }
+import { Button } from "~/components/ui/button";
 
 export default function Home() {
-	const [users, _setUsers] = useState<User[]>([]);
-
 	return (
-		<div>
-			<p
+		<div
+			className={css({
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				justifyContent: "center",
+				minHeight: "100vh",
+				backgroundColor: "#fafafa",
+			})}
+		>
+			<h1
 				className={css({
-					fontSize: "20px",
+					fontSize: "48px",
 					fontWeight: "bold",
-					color: "blue.500",
+					color: "#1a1a1a",
+					marginBottom: "16px",
 				})}
 			>
-				Welcome to the Home Page!
+				maxi-Q
+			</h1>
+
+			<p
+				className={css({
+					fontSize: "18px",
+					color: "#6b6b6b",
+					marginBottom: "48px",
+				})}
+			>
+				匿名で質問・回答ができるQ&Aプラットフォーム
 			</p>
 
-			<h2>User List</h2>
-			<ul>
-				{users.map((user) => (
-					<li key={user.id}>
-						{user.displayId} - {user.name} - {user.email}
-					</li>
-				))}
-			</ul>
+			<div
+				className={css({
+					display: "flex",
+					gap: "16px",
+				})}
+			>
+				<Button as="link" to="/login" size="lg">
+					ログイン
+				</Button>
+
+				<Button as="link" to="/register" variant="secondary" size="lg">
+					新規登録
+				</Button>
+			</div>
 		</div>
 	);
 }

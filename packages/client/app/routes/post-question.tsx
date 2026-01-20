@@ -1,10 +1,15 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 import { postQuestion } from "../hooks/use-question";
 
 export default function QuestionsPage() {
 	const formRef = useRef<HTMLFormElement>(null);
 	const { post } = postQuestion();
+	const navigate = useNavigate();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,6 +32,7 @@ export default function QuestionsPage() {
 			console.log("Question created!", newQuestion);
 
 			formRef.current?.reset();
+			navigate("/timeline");
 		} catch (err) {
 			console.error("質問投稿に失敗しました", err);
 		} finally {
@@ -39,11 +45,17 @@ export default function QuestionsPage() {
 			className={css({
 				maxWidth: "600px",
 				margin: "0 auto",
-				padding: "20px",
-				fontSize: "16px",
+				padding: "24px",
 			})}
 		>
-			<h1 className={css({ fontSize: "24px", marginBottom: "16px" })}>
+			<h1
+				className={css({
+					fontSize: "24px",
+					fontWeight: "bold",
+					marginBottom: "24px",
+					color: "#1a1a1a",
+				})}
+			>
 				質問投稿
 			</h1>
 
@@ -53,67 +65,40 @@ export default function QuestionsPage() {
 				className={css({
 					display: "flex",
 					flexDirection: "column",
-					gap: "16px",
+					gap: "20px",
 				})}
 			>
-				<label
+				<Input
+					label="タイトル"
+					type="text"
+					name="title"
+					required
+					maxLength={100}
+					placeholder="質問のタイトルを入力"
+				/>
+
+				<Textarea
+					label="内容"
+					name="content"
+					required
+					maxLength={5000}
+					placeholder="質問の内容を詳しく記入してください"
+				/>
+
+				<div
 					className={css({
 						display: "flex",
-						flexDirection: "column",
-						gap: "4px",
+						gap: "12px",
 					})}
 				>
-					タイトル:
-					<input
-						type="text"
-						name="title"
-						required
-						maxLength={100}
-						className={css({
-							border: "1px solid #000",
-							padding: "8px",
-							borderRadius: "4px",
-						})}
-					/>
-				</label>
+					<Button type="submit" disabled={isSubmitting}>
+						{isSubmitting ? "投稿中..." : "質問を投稿"}
+					</Button>
 
-				<label
-					htmlFor="content"
-					className={css({
-						display: "flex",
-						flexDirection: "column",
-						gap: "4px",
-					})}
-				>
-					内容:
-					<textarea
-						id="content"
-						name="content"
-						required
-						maxLength={5000}
-						className={css({
-							border: "1px solid #000",
-							padding: "8px",
-							borderRadius: "4px",
-							minHeight: "120px",
-						})}
-					/>
-				</label>
-
-				<button
-					type="submit"
-					disabled={isSubmitting}
-					className={css({
-						padding: "10px 16px",
-						background: isSubmitting ? "#999" : "#333",
-						color: "white",
-						borderRadius: "4px",
-						cursor: isSubmitting ? "not-allowed" : "pointer",
-						_hover: { background: isSubmitting ? "#999" : "#555" },
-					})}
-				>
-					{isSubmitting ? "投稿中..." : "質問を投稿"}
-				</button>
+					<Button as="link" to="/timeline" variant="secondary">
+						キャンセル
+					</Button>
+				</div>
 			</form>
 		</div>
 	);

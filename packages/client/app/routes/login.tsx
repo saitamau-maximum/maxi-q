@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { css } from "styled-system/css";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { useLogin } from "~/hooks/use-login";
 
 export default function LoginPage() {
@@ -19,15 +22,15 @@ export default function LoginPage() {
 				justifyContent: "center",
 				alignItems: "center",
 				minHeight: "100vh",
-				bg: "gray.100",
+				backgroundColor: "#fafafa",
 			})}
 		>
 			<div
 				className={css({
-					p: "8",
-					bg: "white",
-					rounded: "md",
-					shadow: "lg",
+					padding: "32px",
+					backgroundColor: "#fff",
+					borderRadius: "8px",
+					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
 					width: "100%",
 					maxWidth: "400px",
 				})}
@@ -35,10 +38,10 @@ export default function LoginPage() {
 				<h1
 					className={css({
 						textAlign: "center",
-						mb: "6",
-						fontSize: "2xl",
+						marginBottom: "24px",
+						fontSize: "24px",
 						fontWeight: "bold",
-						color: "gray.800",
+						color: "#1a1a1a",
 					})}
 				>
 					ログイン
@@ -49,130 +52,86 @@ export default function LoginPage() {
 					className={css({
 						display: "flex",
 						flexDirection: "column",
-						gap: "5",
+						gap: "20px",
 					})}
 				>
-					<div
-						className={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "2",
-						})}
-					>
-						<label
-							htmlFor="email"
-							className={css({
-								fontSize: "sm",
-								fontWeight: "medium",
-								color: "gray.700",
-							})}
-						>
-							メールアドレス
-						</label>
-						<input
-							id="email"
-							type="email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							required
-							placeholder="user@example.com"
-							className={css({
-								px: "4",
-								py: "2",
-								rounded: "md",
-								borderWidth: "1px",
-								borderColor: "gray.300",
-								fontSize: "md",
-								outline: "none",
-								transition: "all 0.2s",
-								_focus: {
-									borderColor: "blue.500",
-									ring: "2px",
-									ringColor: "blue.200",
-								},
-							})}
-						/>
-					</div>
+					<Input
+						label="メールアドレス"
+						type="email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+						placeholder="user@example.com"
+					/>
 
-					<div
-						className={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "2",
-						})}
-					>
-						<label
-							htmlFor="password"
-							className={css({
-								fontSize: "sm",
-								fontWeight: "medium",
-								color: "gray.700",
-							})}
-						>
-							パスワード
-						</label>
-						<input
-							id="password"
-							type="password"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							required
-							placeholder="8文字以上"
-							className={css({
-								px: "4",
-								py: "2",
-								rounded: "md",
-								borderWidth: "1px",
-								borderColor: "gray.300",
-								fontSize: "md",
-								outline: "none",
-								transition: "all 0.2s",
-								_focus: {
-									borderColor: "blue.500",
-									ring: "2px",
-									ringColor: "blue.200",
-								},
-							})}
-						/>
-					</div>
+					<Input
+						label="パスワード"
+						type="password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						required
+						placeholder="8文字以上"
+					/>
 
 					{error && (
 						<p
 							className={css({
-								color: "red.500",
-								fontSize: "sm",
+								color: "#dc2626",
+								fontSize: "14px",
 								textAlign: "center",
-								fontWeight: "medium",
 							})}
 						>
 							{error}
 						</p>
 					)}
 
-					<button
+					<Button
 						type="submit"
 						disabled={isLoading}
+						className={css({ width: "100%", marginTop: "8px" })}
+					>
+						{isLoading ? "ログイン中..." : "ログイン"}
+					</Button>
+				</form>
+
+				<div
+					className={css({
+						marginTop: "24px",
+						textAlign: "center",
+						fontSize: "14px",
+						color: "#6b6b6b",
+					})}
+				>
+					<p>
+						アカウントをお持ちでない方は
+						<Link
+							to="/register"
+							className={css({
+								color: "#1a1a1a",
+								fontWeight: "medium",
+								marginLeft: "4px",
+								_hover: {
+									textDecoration: "underline",
+								},
+							})}
+						>
+							新規登録
+						</Link>
+					</p>
+					<Link
+						to="/"
 						className={css({
-							mt: "2",
-							py: "3",
-							bg: "blue.600",
-							color: "white",
-							fontWeight: "bold",
-							rounded: "md",
-							cursor: "pointer",
-							transition: "background-color 0.2s",
+							display: "inline-block",
+							marginTop: "12px",
+							color: "#a3a3a3",
 							_hover: {
-								bg: "blue.700",
-							},
-							_disabled: {
-								opacity: 0.7,
-								cursor: "not-allowed",
+								color: "#4a4a4a",
 							},
 						})}
 					>
-						{isLoading ? "ログイン中..." : "ログイン"}
-					</button>
-				</form>
+						ホームに戻る
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
